@@ -5,7 +5,7 @@ INSERT INTO users (
   email
 ) VALUES (
   $1, $2, $3
-) RETURNING id, created_at;
+) RETURNING *;
 
 -- name: GetUserById :one
 SELECT * FROM users

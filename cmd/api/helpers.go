@@ -139,17 +139,3 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int32) i
 
 	return int32(i)
 }
-
-func getYearRuntimeFromFormData(year, runtime string) (int32, int32, error) {
-	year64, err := strconv.ParseInt(year, 10, 32)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	runtime64, err := strconv.ParseInt(runtime, 10, 32)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return int32(year64), int32(runtime64), nil
-}

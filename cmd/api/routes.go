@@ -6,12 +6,16 @@ import (
 
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
-
-	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
-
+	//templates
 	// mux.HandleFunc("GET /", app.showMainPageHandler)
 
-	//templates
+	// health check
+	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
+
+	//users APIs
+	mux.HandleFunc("POST /v1/users", app.createUserHandler)
+	// mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
+
 
 	//movies APIs
 	// mux.HandleFunc("POST /v1/movies", app.createMovieHandler)
@@ -21,9 +25,6 @@ func (app *application) routes() http.Handler {
 	// for API endpoints which perform partial updates on a resource,
 	// it’s appropriate to the use the HTTP method PATCH
 	// rather than PUT (which is intended for replacing a resource in full).
-
-	//users APIs
-	// mux.HandleFunc("POST /v1/users", app.registerUserHandler)
 
 	return app.recoverPanic(
 		app.rateLimit(

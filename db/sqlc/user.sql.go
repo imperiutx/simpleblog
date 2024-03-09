@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -19,7 +18,7 @@ INSERT INTO users (
   email
 ) VALUES (
   $1, $2, $3
-) RETURNING id, created_at
+) RETURNING id, username, password, email, role, status, created_at
 `
 
 type CreateUserParams struct {
@@ -28,15 +27,18 @@ type CreateUserParams struct {
 	Email    string `json:"email"`
 }
 
-type CreateUserRow struct {
-	ID        int64     `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Password, arg.Email)
-	var i CreateUserRow
-	err := row.Scan(&i.ID, &i.CreatedAt)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Email,
+		&i.Role,
+		&i.Status,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
