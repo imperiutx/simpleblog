@@ -14,7 +14,7 @@ import (
 
 const createComment = `-- name: CreateComment :one
 INSERT INTO comments (
-  user_id,
+  username,
   post_id,
   content
 ) VALUES (
@@ -23,9 +23,9 @@ INSERT INTO comments (
 `
 
 type CreateCommentParams struct {
-	UserID  pgtype.Int8 `json:"user_id"`
-	PostID  pgtype.Int8 `json:"post_id"`
-	Content string      `json:"content"`
+	Username pgtype.Text `json:"username"`
+	PostID   pgtype.Int8 `json:"post_id"`
+	Content  string      `json:"content"`
 }
 
 type CreateCommentRow struct {
@@ -34,7 +34,7 @@ type CreateCommentRow struct {
 }
 
 func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (CreateCommentRow, error) {
-	row := q.db.QueryRow(ctx, createComment, arg.UserID, arg.PostID, arg.Content)
+	row := q.db.QueryRow(ctx, createComment, arg.Username, arg.PostID, arg.Content)
 	var i CreateCommentRow
 	err := row.Scan(&i.ID, &i.CreatedAt)
 	return i, err

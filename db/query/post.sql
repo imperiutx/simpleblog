@@ -1,15 +1,20 @@
 -- name: CreatePost :one
 INSERT INTO posts (
-  user_id,
+  username,
   title,
   content
 ) VALUES (
   $1, $2, $3
-) RETURNING id, created_at;
+) RETURNING *;
 
 -- name: GetPostById :one
 SELECT * FROM posts
 WHERE id = $1 LIMIT 1;
+
+-- name: GetPostForUpdate :one
+SELECT * FROM posts
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE;
 
 -- name: ListPosts :many
 SELECT * FROM posts

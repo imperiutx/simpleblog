@@ -17,14 +17,16 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
 	mux.HandleFunc("PATCH /v1/users/{id}", app.updateUserHandler)
 
-	//movies APIs
-	// mux.HandleFunc("POST /v1/movies", app.createMovieHandler)
-	// mux.HandleFunc("GET /v1/movies/{id}", app.showMovieHandler)
-	// mux.HandleFunc("GET /v1/movies/", app.listMoviesHandler)
-	// mux.HandleFunc("PATCH /v1/movies/{id}", app.updateMovieHandler)
+	//posts APIs
+	mux.HandleFunc("POST /v1/posts", app.createPostHandler)
+	// mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
+	// mux.HandleFunc("GET /v1/posts/", app.listPostsHandler)
+	// mux.HandleFunc("PATCH /v1/posts/{id}", app.updatePostHandler)
 	// for API endpoints which perform partial updates on a resource,
 	// it’s appropriate to the use the HTTP method PATCH
 	// rather than PUT (which is intended for replacing a resource in full).
+
+	//comments API
 
 	return app.recoverPanic(
 		app.rateLimit(

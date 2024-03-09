@@ -10,7 +10,7 @@ CREATE TABLE "users" (
 
 CREATE TABLE "posts" (
   "id" bigserial PRIMARY KEY,
-  "user_id" bigint,
+  "username" varchar,
   "title" varchar NOT NULL,
   "content" text NOT NULL,
   "status" boolean NOT NULL DEFAULT true,
@@ -20,7 +20,7 @@ CREATE TABLE "posts" (
 
 CREATE TABLE "comments" (
   "id" bigserial PRIMARY KEY,
-  "user_id" bigint,
+  "username" varchar,
   "post_id" bigint,
   "content" text NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
@@ -29,14 +29,14 @@ CREATE TABLE "comments" (
 
 CREATE INDEX ON "users" ("username");
 
-CREATE INDEX ON "posts" ("user_id");
+CREATE INDEX ON "posts" ("username");
 
-CREATE INDEX ON "comments" ("user_id");
+CREATE INDEX ON "comments" ("username");
 
 CREATE INDEX ON "comments" ("post_id");
 
-ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "posts" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
-ALTER TABLE "comments" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "comments" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "comments" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");

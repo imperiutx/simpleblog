@@ -1,6 +1,6 @@
 -- name: CreateComment :one
 INSERT INTO comments (
-  user_id,
+  username,
   post_id,
   content
 ) VALUES (

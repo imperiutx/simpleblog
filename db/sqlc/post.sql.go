@@ -14,29 +14,32 @@ import (
 
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (
-  user_id,
+  username,
   title,
   content
 ) VALUES (
   $1, $2, $3
-) RETURNING id, created_at
+) RETURNING id, username, title, content, status, created_at, edited_at
 `
 
 type CreatePostParams struct {
-	UserID  pgtype.Int8 `json:"user_id"`
-	Title   string      `json:"title"`
-	Content string      `json:"content"`
+	Username pgtype.Text `json:"username"`
+	Title    string      `json:"title"`
+	Content  string      `json:"content"`
 }
 
-type CreatePostRow struct {
-	ID        int64     `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (CreatePostRow, error) {
-	row := q.db.QueryRow(ctx, createPost, arg.UserID, arg.Title, arg.Content)
-	var i CreatePostRow
-	err := row.Scan(&i.ID, &i.CreatedAt)
+func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
+	row := q.db.QueryRow(ctx, createPost, arg.Username, arg.Title, arg.Content)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Title,
+		&i.Content,
+		&i.Status,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
 	return i, err
 }
 
@@ -51,7 +54,7 @@ func (q *Queries) DeletePost(ctx context.Context, id int64) error {
 }
 
 const getPostById = `-- name: GetPostById :one
-SELECT id, user_id, title, content, status, created_at, edited_at FROM posts
+SELECT id, username, title, content, status, created_at, edited_at FROM posts
 WHERE id = $1 LIMIT 1
 `
 
@@ -60,7 +63,28 @@ func (q *Queries) GetPostById(ctx context.Context, id int64) (Post, error) {
 	var i Post
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.Username,
+		&i.Title,
+		&i.Content,
+		&i.Status,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
+	return i, err
+}
+
+const getPostForUpdate = `-- name: GetPostForUpdate :one
+SELECT id, username, title, content, status, created_at, edited_at FROM posts
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetPostForUpdate(ctx context.Context, id int64) (Post, error) {
+	row := q.db.QueryRow(ctx, getPostForUpdate, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
 		&i.Title,
 		&i.Content,
 		&i.Status,
@@ -71,7 +95,7 @@ func (q *Queries) GetPostById(ctx context.Context, id int64) (Post, error) {
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT id, user_id, title, content, status, created_at, edited_at FROM posts
+SELECT id, username, title, content, status, created_at, edited_at FROM posts
 ORDER BY id DESC
 `
 
@@ -86,7 +110,7 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 		var i Post
 		if err := rows.Scan(
 			&i.ID,
-			&i.UserID,
+			&i.Username,
 			&i.Title,
 			&i.Content,
 			&i.Status,

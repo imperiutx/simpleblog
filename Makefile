@@ -1,6 +1,8 @@
 run:
 	go run ./cmd/api
 
+db:	network postgres
+
 network:
 	docker network create simpleblog-network
 

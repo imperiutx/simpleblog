@@ -12,7 +12,7 @@ import (
 
 type Comment struct {
 	ID        int64       `json:"id"`
-	UserID    pgtype.Int8 `json:"user_id"`
+	Username  pgtype.Text `json:"username"`
 	PostID    pgtype.Int8 `json:"post_id"`
 	Content   string      `json:"content"`
 	CreatedAt time.Time   `json:"created_at"`
@@ -21,7 +21,7 @@ type Comment struct {
 
 type Post struct {
 	ID        int64       `json:"id"`
-	UserID    pgtype.Int8 `json:"user_id"`
+	Username  pgtype.Text `json:"username"`
 	Title     string      `json:"title"`
 	Content   string      `json:"content"`
 	Status    bool        `json:"status"`
