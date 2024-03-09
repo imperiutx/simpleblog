@@ -17,6 +17,7 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id int64) error
 	GetPostById(ctx context.Context, id int64) (Post, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
+	GetUserForUpdate(ctx context.Context, id int64) (User, error)
 	ListPosts(ctx context.Context) ([]Post, error)
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (UpdateCommentRow, error)
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (UpdatePostRow, error)

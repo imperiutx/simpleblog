@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	db "simpleblog/db/sqlc"
 	"simpleblog/util"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type createUserRequest struct {
@@ -93,4 +95,104 @@ func (app *application) createUserHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+}
+
+func (app *application) showUserHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	user, err := app.store.GetUserById(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	rsp := newUserResponse(user)
+
+	if err = app.writeJSON(
+		w,
+		http.StatusAccepted,
+		envelope{"user": rsp}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}
+
+func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request) {
+	uid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	user, err := app.store.GetUserForUpdate(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	var updateUserRequest struct {
+		Password string `json:"password" validate:"required,min=8"`
+		Status   bool   `json:"status"`
+	}
+
+	if err := app.readJSON(w, r, &updateUserRequest); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	validate := validator.New()
+
+	if err := validate.Struct(updateUserRequest); err != nil {
+		errors := err.(validator.ValidationErrors)
+		app.badRequestResponse(w, r, errors)
+		return
+	}
+
+	hashedPassword, err := util.HashPassword(updateUserRequest.Password)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	data := db.UpdateUserParams{
+		ID: user.ID,
+		Password: pgtype.Text{
+			String: hashedPassword,
+			Valid:  hashedPassword != "",
+		},
+		Status: pgtype.Bool{
+			Bool:  updateUserRequest.Status,
+			Valid: true,
+		},
+	}
+
+	_, err = app.store.UpdateUser(r.Context(), data)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err = app.writeJSON(
+		w,
+		http.StatusAccepted,
+		envelope{"update_user": "success"}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }

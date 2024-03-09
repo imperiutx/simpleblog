@@ -72,36 +72,44 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 	return i, err
 }
 
+const getUserForUpdate = `-- name: GetUserForUpdate :one
+SELECT id, username, password, email, role, status, created_at FROM users
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetUserForUpdate(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, getUserForUpdate, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Email,
+		&i.Role,
+		&i.Status,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET 
-  username = COALESCE($1, username),
-  email = COALESCE($2, email), 
-  password = COALESCE($3, password), 
-  role = COALESCE($4, role), 
-  status = COALESCE($5, status)
-WHERE id = $6
+  password = COALESCE($1, password),
+  status = COALESCE($2, status)
+WHERE id = $3
 RETURNING id
 `
 
 type UpdateUserParams struct {
-	Username pgtype.Text `json:"username"`
-	Email    pgtype.Text `json:"email"`
 	Password pgtype.Text `json:"password"`
-	Role     pgtype.Text `json:"role"`
 	Status   pgtype.Bool `json:"status"`
 	ID       int64       `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (int64, error) {
-	row := q.db.QueryRow(ctx, updateUser,
-		arg.Username,
-		arg.Email,
-		arg.Password,
-		arg.Role,
-		arg.Status,
-		arg.ID,
-	)
+	row := q.db.QueryRow(ctx, updateUser, arg.Password, arg.Status, arg.ID)
 	var id int64
 	err := row.Scan(&id)
 	return id, err

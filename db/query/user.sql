@@ -11,13 +11,15 @@ INSERT INTO users (
 SELECT * FROM users
 WHERE id = $1 LIMIT 1;
 
+-- name: GetUserForUpdate :one
+SELECT * FROM users
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE;
+
 -- name: UpdateUser :one
 UPDATE users
 SET 
-  username = COALESCE(sqlc.narg(username), username),
-  email = COALESCE(sqlc.narg(email), email), 
-  password = COALESCE(sqlc.narg(password), password), 
-  role = COALESCE(sqlc.narg(role), role), 
+  password = COALESCE(sqlc.narg(password), password),
   status = COALESCE(sqlc.narg(status), status)
 WHERE id = sqlc.arg(id)
 RETURNING id;

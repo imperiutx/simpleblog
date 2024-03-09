@@ -14,8 +14,8 @@ func (app *application) routes() http.Handler {
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
-	// mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
-
+	mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
+	mux.HandleFunc("PATCH /v1/users/{id}", app.updateUserHandler)
 
 	//movies APIs
 	// mux.HandleFunc("POST /v1/movies", app.createMovieHandler)
