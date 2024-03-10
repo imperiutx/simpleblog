@@ -17,3 +17,7 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 		app.serverErrorResponse(w, r, err)
 	}
 }
+
+func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Request) {
+	
+}

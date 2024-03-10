@@ -19,7 +19,7 @@ INSERT INTO posts (
   content
 ) VALUES (
   $1, $2, $3
-) RETURNING id, username, title, content, status, created_at, edited_at
+) RETURNING id, username, title, content, tags, status, created_at, edited_at
 `
 
 type CreatePostParams struct {
@@ -36,6 +36,7 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.Username,
 		&i.Title,
 		&i.Content,
+		&i.Tags,
 		&i.Status,
 		&i.CreatedAt,
 		&i.EditedAt,
@@ -54,7 +55,7 @@ func (q *Queries) DeletePost(ctx context.Context, id int64) error {
 }
 
 const getPostById = `-- name: GetPostById :one
-SELECT id, username, title, content, status, created_at, edited_at FROM posts
+SELECT id, username, title, content, tags, status, created_at, edited_at FROM posts
 WHERE id = $1 LIMIT 1
 `
 
@@ -66,6 +67,7 @@ func (q *Queries) GetPostById(ctx context.Context, id int64) (Post, error) {
 		&i.Username,
 		&i.Title,
 		&i.Content,
+		&i.Tags,
 		&i.Status,
 		&i.CreatedAt,
 		&i.EditedAt,
@@ -74,7 +76,7 @@ func (q *Queries) GetPostById(ctx context.Context, id int64) (Post, error) {
 }
 
 const getPostForUpdate = `-- name: GetPostForUpdate :one
-SELECT id, username, title, content, status, created_at, edited_at FROM posts
+SELECT id, username, title, content, tags, status, created_at, edited_at FROM posts
 WHERE id = $1 LIMIT 1
 FOR NO KEY UPDATE
 `
@@ -87,6 +89,7 @@ func (q *Queries) GetPostForUpdate(ctx context.Context, id int64) (Post, error) 
 		&i.Username,
 		&i.Title,
 		&i.Content,
+		&i.Tags,
 		&i.Status,
 		&i.CreatedAt,
 		&i.EditedAt,
@@ -95,7 +98,7 @@ func (q *Queries) GetPostForUpdate(ctx context.Context, id int64) (Post, error) 
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT id, username, title, content, status, created_at, edited_at FROM posts
+SELECT id, username, title, content, tags, status, created_at, edited_at FROM posts
 ORDER BY id DESC
 `
 
@@ -113,6 +116,7 @@ func (q *Queries) ListPosts(ctx context.Context) ([]Post, error) {
 			&i.Username,
 			&i.Title,
 			&i.Content,
+			&i.Tags,
 			&i.Status,
 			&i.CreatedAt,
 			&i.EditedAt,
@@ -131,7 +135,8 @@ const updatePost = `-- name: UpdatePost :one
 UPDATE posts
 SET 
   title = COALESCE($1, title),
-  content = COALESCE($2, content)
+  content = COALESCE($2, content),
+  edited_at = now()
 WHERE id = $3
 RETURNING id, edited_at
 `

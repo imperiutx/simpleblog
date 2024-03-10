@@ -142,57 +142,73 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var updateUserRequest struct {
-		Password string `json:"password" validate:"required,min=8"`
-		Status   bool   `json:"status"`
-	}
+	switch r.Header.Get("Content-Type") {
+	case "application/json":
+		var updateUserRequest struct {
+			Password string `json:"password" validate:"required,min=8"`
+			Status   bool   `json:"status"`
+		}
 
-	if err := app.readJSON(w, r, &updateUserRequest); err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
-	validate := validator.New()
-
-	if err := validate.Struct(updateUserRequest); err != nil {
-		errors := err.(validator.ValidationErrors)
-		app.badRequestResponse(w, r, errors)
-		return
-	}
-
-	hashedPassword, err := util.HashPassword(updateUserRequest.Password)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-
-	data := db.UpdateUserParams{
-		ID: user.ID,
-		Password: pgtype.Text{
-			String: hashedPassword,
-			Valid:  hashedPassword != "",
-		},
-		Status: pgtype.Bool{
-			Bool:  updateUserRequest.Status,
-			Valid: true,
-		},
-	}
-
-	_, err = app.store.UpdateUser(r.Context(), data)
-	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			app.notFoundResponse(w, r)
+		if err := app.readJSON(w, r, &updateUserRequest); err != nil {
+			app.badRequestResponse(w, r, err)
 			return
 		}
-		app.serverErrorResponse(w, r, err)
+
+		validate := validator.New()
+
+		if err := validate.Struct(updateUserRequest); err != nil {
+			errors := err.(validator.ValidationErrors)
+			app.badRequestResponse(w, r, errors)
+			return
+		}
+
+		hashedPassword, err := util.HashPassword(updateUserRequest.Password)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		data := db.UpdateUserParams{
+			ID: user.ID,
+			Password: pgtype.Text{
+				String: hashedPassword,
+				Valid:  hashedPassword != "",
+			},
+			Status: pgtype.Bool{
+				Bool:  updateUserRequest.Status,
+				Valid: true,
+			},
+		}
+
+		_, err = app.store.UpdateUser(r.Context(), data)
+		if err != nil {
+			if errors.Is(err, db.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		if err = app.writeJSON(
+			w,
+			http.StatusAccepted,
+			envelope{"update_user": "success"}, nil); err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+	case "application/x-www-form-urlencoded":
+		if err := r.ParseForm(); err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		//TODO: handle more
+
+	default:
+		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
 		return
 	}
 
-	if err = app.writeJSON(
-		w,
-		http.StatusAccepted,
-		envelope{"update_user": "success"}, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
 }

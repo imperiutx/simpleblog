@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	db "simpleblog/db/sqlc"
 	"time"
@@ -72,5 +73,123 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 			app.serverErrorResponse(w, r, err)
 			return
 		}
+
+	case "application/x-www-form-urlencoded":
+		if err := r.ParseForm(); err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		//TODO: handle more
+
+	default:
+		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
+		return
 	}
 }
+
+func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) {
+	pid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	post, err := app.store.GetPostById(r.Context(), pid)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	rsp := newPostResponse(post)
+
+	if err = app.writeJSON(
+		w,
+		http.StatusAccepted,
+		envelope{"post": rsp}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}
+
+func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+	pid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	post, err := app.store.GetPostForUpdate(r.Context(), pid)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	switch r.Header.Get("Content-Type") {
+	case "application/json":
+
+		var updatePostRequest struct {
+			Title   string `json:"title"`
+			Content string `json:"content"`
+		}
+
+		if err := app.readJSON(w, r, &updatePostRequest); err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		data := db.UpdatePostParams{
+			ID: post.ID,
+			Title: pgtype.Text{
+				String: updatePostRequest.Title,
+				Valid:  true,
+			},
+			Content: pgtype.Text{
+				String: updatePostRequest.Content,
+				Valid:  true,
+			},
+		}
+
+		_, err = app.store.UpdatePost(r.Context(), data)
+		if err != nil {
+			if errors.Is(err, db.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		if err = app.writeJSON(
+			w,
+			http.StatusAccepted,
+			envelope{"update_post": "success"}, nil); err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+	case "application/x-www-form-urlencoded":
+		if err := r.ParseForm(); err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		//TODO: handle more
+
+	default:
+		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
+		return
+	}
+
+}
+
+// func (app *application) listPostsHandler(w http.ResponseWriter, r *http.Request) {
+
+// }

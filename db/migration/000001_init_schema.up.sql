@@ -13,6 +13,7 @@ CREATE TABLE "posts" (
   "username" varchar,
   "title" varchar NOT NULL,
   "content" text NOT NULL,
+  "tags" text[] NOT NULL,
   "status" boolean NOT NULL DEFAULT true,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "edited_at" timestamptz NOT NULL DEFAULT (now())

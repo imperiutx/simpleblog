@@ -24,6 +24,7 @@ type Post struct {
 	Username  pgtype.Text `json:"username"`
 	Title     string      `json:"title"`
 	Content   string      `json:"content"`
+	Tags      []string    `json:"tags"`
 	Status    bool        `json:"status"`
 	CreatedAt time.Time   `json:"created_at"`
 	EditedAt  time.Time   `json:"edited_at"`

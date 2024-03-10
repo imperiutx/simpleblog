@@ -24,7 +24,8 @@ ORDER BY id DESC;
 UPDATE posts
 SET 
   title = COALESCE(sqlc.narg(title), title),
-  content = COALESCE(sqlc.narg(content), content)
+  content = COALESCE(sqlc.narg(content), content),
+  edited_at = now()
 WHERE id = sqlc.arg(id)
 RETURNING id, edited_at;
 
