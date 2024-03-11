@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"html/template"
 	"net/http"
 	db "simpleblog/db/sqlc"
 	"time"
@@ -13,7 +14,7 @@ import (
 type createPostRequest struct {
 	Title   string   `json:"title" validate:"required"`
 	Content string   `json:"content" validate:"required"`
-	Tags    []string `json:"tags""`
+	Tags    []string `json:"tags"`
 }
 
 type postResponse struct {
@@ -93,6 +94,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/post.html"))
 	pid, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
@@ -109,15 +111,15 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	rsp := newPostResponse(post)
+	tmpl.Execute(w, post)
 
-	if err = app.writeJSON(
-		w,
-		http.StatusAccepted,
-		envelope{"post": rsp}, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+	// if err = app.writeJSON(
+	// 	w,
+	// 	http.StatusAccepted,
+	// 	envelope{"post": rsp}, nil); err != nil {
+	// 	app.serverErrorResponse(w, r, err)
+	// 	return
+	// }
 }
 
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {

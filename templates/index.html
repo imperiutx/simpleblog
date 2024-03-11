@@ -10,7 +10,7 @@
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
         crossorigin="anonymous"></script>
 
-    <title>My Blog - Updated Layout</title>
+    <title>My Blog</title>
 </head>
 
 <body class="container">
@@ -42,17 +42,17 @@
         <section class="col-md-6 col-sm-8 middlecolumn">
             <h2>Latest Posts</h2>
             {{range .Posts}}
-            <article class="card shadow-sm rounded">
-                <h2>{{ .Title }}</h2>
+            <article class="card shadow-sm rounded mb-3"> <a href="/v1/post/{{.ID}}"
+                    class="card-title stretched-link text-decoration-none">
+                    <h2>{{ .Title }}</h2>
+                </a>
 
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title">By {{ .Username }} on {{ .CreatedAt.Format "2006-01-02" }}</h5>
-                        <p class="text-muted">{{ .Tags }}</p>
+                        <h5 class="card-title">{{ .Username }} <br> {{ .CreatedAt.Format "2006-01-02" }}</h5>
+                        <p class="mb-0">Tags: {{.Tags}}</p>
                     </div>
-                    <!-- <p>{{ .Content }}</p> -->
                 </div>
-                <a href="/post?id={{.ID}}" class="btn btn-primary btn-sm px-3">Read more</a>
             </article>
             {{end}}
         </section>
