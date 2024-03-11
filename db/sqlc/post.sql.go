@@ -16,9 +16,10 @@ const createPost = `-- name: CreatePost :one
 INSERT INTO posts (
   username,
   title,
-  content
+  content, 
+  tags
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 ) RETURNING id, username, title, content, tags, status, created_at, edited_at
 `
 
@@ -26,10 +27,16 @@ type CreatePostParams struct {
 	Username pgtype.Text `json:"username"`
 	Title    string      `json:"title"`
 	Content  string      `json:"content"`
+	Tags     []string    `json:"tags"`
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
-	row := q.db.QueryRow(ctx, createPost, arg.Username, arg.Title, arg.Content)
+	row := q.db.QueryRow(ctx, createPost,
+		arg.Username,
+		arg.Title,
+		arg.Content,
+		arg.Tags,
+	)
 	var i Post
 	err := row.Scan(
 		&i.ID,

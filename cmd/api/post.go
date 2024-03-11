@@ -11,23 +11,26 @@ import (
 )
 
 type createPostRequest struct {
-	Title   string `json:"title" validate:"required"`
-	Content string `json:"content" validate:"required"`
+	Title   string   `json:"title" validate:"required"`
+	Content string   `json:"content" validate:"required"`
+	Tags    []string `json:"tags""`
 }
 
 type postResponse struct {
-	Username  string    `json:"username"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
+	Username string    `json:"username"`
+	Title    string    `json:"title"`
+	Content  string    `json:"content"`
+	Tags     []string  `json:"tags"`
+	EditedAt time.Time `json:"created_at"`
 }
 
 func newPostResponse(post db.Post) postResponse {
 	return postResponse{
-		Username:  post.Username.String,
-		Title:     post.Title,
-		Content:   post.Content,
-		CreatedAt: post.CreatedAt,
+		Username: post.Username.String,
+		Title:    post.Title,
+		Content:  post.Content,
+		Tags:     post.Tags,
+		EditedAt: post.EditedAt,
 	}
 }
 
@@ -56,6 +59,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 			},
 			Title:   req.Title,
 			Content: req.Content,
+			Tags:    []string{"news"},
 		}
 
 		newPost, err := app.store.CreatePost(r.Context(), post)

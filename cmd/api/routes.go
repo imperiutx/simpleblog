@@ -19,7 +19,7 @@ func (app *application) routes() http.Handler {
 
 	//posts APIs
 	mux.HandleFunc("POST /v1/posts", app.createPostHandler)
-	mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
+	mux.HandleFunc("GET /v1/post/{id}", app.showPostHandler)
 	// mux.HandleFunc("GET /v1/posts/", app.listPostsHandler)
 	mux.HandleFunc("PATCH /v1/posts/{id}", app.updatePostHandler)
 	// for API endpoints which perform partial updates on a resource,

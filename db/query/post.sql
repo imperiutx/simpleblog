@@ -2,9 +2,10 @@
 INSERT INTO posts (
   username,
   title,
-  content
+  content, 
+  tags
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 ) RETURNING *;
 
 -- name: GetPostById :one
