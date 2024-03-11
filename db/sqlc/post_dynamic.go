@@ -8,7 +8,7 @@ import (
 func (q *QueriesDynamic) ListPostsDynamic(ctx context.Context, title string, tags []string, filters Filters) ([]*Post, Metadata, error) {
 
 	query := fmt.Sprintf(`
-	SELECT COUNT(*) OVER(), id, username, title, content, tags, status, created_at, edited_at
+	SELECT COUNT(*) OVER(), id, username, title, content, tags, status, DATE(created_at), edited_at
 	FROM "posts"
 	WHERE
 		(TO_TSVECTOR('simple', title) @@ PLAINTO_TSQUERY('simple', $1) OR $1 = '')
