@@ -35,6 +35,16 @@ func newPostResponse(post db.Post) postResponse {
 	}
 }
 
+func (app *application) getCreateFormHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/create_post.html"))
+	if err := r.ParseForm(); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	tmpl.Execute(w, nil)
+}
+
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Header.Get("Content-Type") {
 	case "application/json":
@@ -80,12 +90,22 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		}
 
 	case "application/x-www-form-urlencoded":
-		if err := r.ParseForm(); err != nil {
-			app.badRequestResponse(w, r, err)
-			return
+
+		post := db.CreatePostParams{
+			Username: pgtype.Text{
+				String: "rootadmin",
+				Valid:  true,
+			},
+			Title:   r.PostFormValue("title"),
+			Content: r.PostFormValue("content"),
+			Tags:    []string{"news"},
 		}
 
-		//TODO: handle more
+		_, err := app.store.CreatePost(r.Context(), post)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
 
 	default:
 		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
@@ -122,7 +142,9 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 	// }
 }
 
-func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) getPostForEditHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/edit_post.html"))
+
 	pid, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
@@ -136,6 +158,26 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	tmpl.Execute(w, post)
+
+	// if err = app.writeJSON(
+	// 	w,
+	// 	http.StatusAccepted,
+	// 	nil, nil); err != nil {
+	// 	app.serverErrorResponse(w, r, err)
+	// 	return
+	// }
+
+}
+
+func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+
+	pid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
 		return
 	}
 
@@ -153,7 +195,7 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		}
 
 		data := db.UpdatePostParams{
-			ID: post.ID,
+			ID: pid,
 			Title: pgtype.Text{
 				String: updatePostRequest.Title,
 				Valid:  true,
@@ -187,7 +229,35 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		//TODO: handle more
+		data := db.UpdatePostParams{
+			ID: pid,
+			Title: pgtype.Text{
+				String: r.FormValue("title"),
+				Valid:  true,
+			},
+			Content: pgtype.Text{
+				String: r.FormValue("content"),
+				Valid:  true,
+			},
+		}
+
+		_, err := app.store.UpdatePost(r.Context(), data)
+		if err != nil {
+			if errors.Is(err, db.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		if err = app.writeJSON(
+			w,
+			http.StatusAccepted,
+			envelope{"update_post": "success"}, nil); err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
 
 	default:
 		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)

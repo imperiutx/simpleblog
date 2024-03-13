@@ -10,7 +10,7 @@
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
         crossorigin="anonymous"></script>
 
-    <title>My Blog - {{.Title}}</title>
+    <title>My Blog</title>
 </head>
 
 <body>
@@ -30,7 +30,9 @@
             <div class="card-footer text-muted">
                 <p class="mb-0">Tags: {{.Tags}}</p>
             </div>
+
         </article>
+        <button hx-get="/v1/post/{{.ID}}/edit" hx-swap="outerHTML" class="btn btn-sm btn-primary ms-2">Edit</button>
     </main>
 
     <footer class="footer">

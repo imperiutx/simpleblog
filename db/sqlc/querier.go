@@ -21,7 +21,7 @@ type Querier interface {
 	GetUserForUpdate(ctx context.Context, id int64) (User, error)
 	ListPosts(ctx context.Context) ([]Post, error)
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (UpdateCommentRow, error)
-	UpdatePost(ctx context.Context, arg UpdatePostParams) (UpdatePostRow, error)
+	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (int64, error)
 }
 
