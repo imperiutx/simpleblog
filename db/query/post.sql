@@ -28,7 +28,7 @@ SET
   content = COALESCE(sqlc.narg(content), content),
   edited_at = now()
 WHERE id = sqlc.arg(id)
-RETURNING id, edited_at;
+RETURNING *;
 
 -- name: DeletePost :exec
 DELETE FROM posts

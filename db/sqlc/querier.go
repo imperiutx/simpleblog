@@ -6,10 +6,12 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
-	CreateComment(ctx context.Context, arg CreateCommentParams) (CreateCommentRow, error)
+	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteComment(ctx context.Context, id int64) error
@@ -19,9 +21,10 @@ type Querier interface {
 	GetPostForUpdate(ctx context.Context, id int64) (Post, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserForUpdate(ctx context.Context, id int64) (User, error)
+	ListCommentsByPostID(ctx context.Context, postID pgtype.Int8) ([]Comment, error)
 	ListPosts(ctx context.Context) ([]Post, error)
-	UpdateComment(ctx context.Context, arg UpdateCommentParams) (UpdateCommentRow, error)
-	UpdatePost(ctx context.Context, arg UpdatePostParams) (UpdatePostRow, error)
+	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
+	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (int64, error)
 }
 

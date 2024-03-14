@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -145,7 +144,7 @@ SET
   content = COALESCE($2, content),
   edited_at = now()
 WHERE id = $3
-RETURNING id, edited_at
+RETURNING id, username, title, content, tags, status, created_at, edited_at
 `
 
 type UpdatePostParams struct {
@@ -154,14 +153,18 @@ type UpdatePostParams struct {
 	ID      int64       `json:"id"`
 }
 
-type UpdatePostRow struct {
-	ID       int64     `json:"id"`
-	EditedAt time.Time `json:"edited_at"`
-}
-
-func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (UpdatePostRow, error) {
+func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error) {
 	row := q.db.QueryRow(ctx, updatePost, arg.Title, arg.Content, arg.ID)
-	var i UpdatePostRow
-	err := row.Scan(&i.ID, &i.EditedAt)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Title,
+		&i.Content,
+		&i.Tags,
+		&i.Status,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
 	return i, err
 }

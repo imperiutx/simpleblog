@@ -37,6 +37,8 @@ func run() error {
 		return err
 	}
 
+	logger.Info("configuration loaded")
+
 	//Context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
