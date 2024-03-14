@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
         crossorigin="anonymous"></script>
-
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <title>My Blog</title>
 </head>
 
@@ -42,7 +42,7 @@
         <section class="col-md-6 col-sm-8 middlecolumn">
             <h2>Latest Posts</h2>
             {{range .Posts}}
-            <article class="card shadow-sm rounded mb-3"> <a href="/v1/post/{{.ID}}"
+            <article class="card shadow-sm rounded mb-3"> <a href="/v1/posts/{{.ID}}"
                     class="card-title stretched-link text-decoration-none">
                     <h2>{{ .Title }}</h2>
                 </a>
@@ -79,7 +79,7 @@
             </ul>
             <hr>
             <h3>Create New Post</h3>
-            <button hx-get="/v1/post/new" hx-swap="outerHTML" class="btn btn-primary mb-3">Create New Post
+            <button hx-get="/v1/posts/new" hx-swap="outerHTML" class="btn btn-primary mb-3">Create New Post
             </button>
         </aside>
     </main>

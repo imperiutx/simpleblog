@@ -35,7 +35,12 @@ func newPostResponse(post db.Post) postResponse {
 	}
 }
 
-func (app *application) getCreateFormHandler(w http.ResponseWriter, r *http.Request) {
+type postData struct {
+	post     db.Post
+	comments []db.Comment
+}
+
+func (app *application) getCreatePostFormHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./templates/create_post.html"))
 	if err := r.ParseForm(); err != nil {
 		app.badRequestResponse(w, r, err)
@@ -133,13 +138,6 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 
 	tmpl.Execute(w, post)
 
-	// if err = app.writeJSON(
-	// 	w,
-	// 	http.StatusAccepted,
-	// 	envelope{"post": rsp}, nil); err != nil {
-	// 	app.serverErrorResponse(w, r, err)
-	// 	return
-	// }
 }
 
 func (app *application) getPostForEditHandler(w http.ResponseWriter, r *http.Request) {
@@ -162,15 +160,6 @@ func (app *application) getPostForEditHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	tmpl.Execute(w, post)
-
-	// if err = app.writeJSON(
-	// 	w,
-	// 	http.StatusAccepted,
-	// 	nil, nil); err != nil {
-	// 	app.serverErrorResponse(w, r, err)
-	// 	return
-	// }
-
 }
 
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -253,8 +242,7 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 
 		if err = app.writeJSON(
 			w,
-			http.StatusAccepted,
-			envelope{"update_post": "success"}, nil); err != nil {
+			http.StatusAccepted, envelope{"Status": "Post updated successfully"}, nil); err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
@@ -265,7 +253,3 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	}
 
 }
-
-// func (app *application) listPostsHandler(w http.ResponseWriter, r *http.Request) {
-
-// }

@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -19,7 +18,7 @@ INSERT INTO comments (
   content
 ) VALUES (
   $1, $2, $3
-) RETURNING id, created_at
+) RETURNING id, username, post_id, content, created_at, edited_at
 `
 
 type CreateCommentParams struct {
@@ -28,15 +27,17 @@ type CreateCommentParams struct {
 	Content  string      `json:"content"`
 }
 
-type CreateCommentRow struct {
-	ID        int64     `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (CreateCommentRow, error) {
+func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
 	row := q.db.QueryRow(ctx, createComment, arg.Username, arg.PostID, arg.Content)
-	var i CreateCommentRow
-	err := row.Scan(&i.ID, &i.CreatedAt)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PostID,
+		&i.Content,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
 	return i, err
 }
 
@@ -50,12 +51,46 @@ func (q *Queries) DeleteComment(ctx context.Context, id int64) error {
 	return err
 }
 
+const listCommentsByPostID = `-- name: ListCommentsByPostID :many
+SELECT id, username, post_id, content, created_at, edited_at
+FROM comments
+WHERE post_id = $1
+ORDER BY id
+`
+
+func (q *Queries) ListCommentsByPostID(ctx context.Context, postID pgtype.Int8) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, listCommentsByPostID, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.PostID,
+			&i.Content,
+			&i.CreatedAt,
+			&i.EditedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateComment = `-- name: UpdateComment :one
 UPDATE comments
 SET
   content = COALESCE($1, content)
 WHERE id = $2
-RETURNING id, edited_at
+RETURNING id, username, post_id, content, created_at, edited_at
 `
 
 type UpdateCommentParams struct {
@@ -63,14 +98,16 @@ type UpdateCommentParams struct {
 	ID      int64       `json:"id"`
 }
 
-type UpdateCommentRow struct {
-	ID       int64     `json:"id"`
-	EditedAt time.Time `json:"edited_at"`
-}
-
-func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (UpdateCommentRow, error) {
+func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error) {
 	row := q.db.QueryRow(ctx, updateComment, arg.Content, arg.ID)
-	var i UpdateCommentRow
-	err := row.Scan(&i.ID, &i.EditedAt)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PostID,
+		&i.Content,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
 	return i, err
 }

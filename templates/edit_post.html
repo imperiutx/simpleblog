@@ -9,18 +9,12 @@
   <script src="https://unpkg.com/htmx.org@1.9.10"
     integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
     crossorigin="anonymous"></script>
-  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-  <script>
-    tinymce.init({
-      selector: '#mytextarea',
-    });
-  </script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
 </head>
 
 <body>
-  <h1>Update the post</h1>
 
-  <form hx-patch="/v1/post/{{.ID}}" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
+  <form hx-patch="/v1/posts/{{.ID}}" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
     <h2>Edit Post</h2>
 
     <div class="mb-3">
@@ -34,7 +28,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Save Changes</button>
-    <button hx-get="/v1/post/{{.ID}}" class="btn btn-secondary">Cancel</button>
+    <button hx-get="/v1/posts/{{.ID}}" hx-swap="delete" class="btn btn-secondary">Cancel</button>
   </form>
 
 </body>
