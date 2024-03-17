@@ -61,5 +61,8 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	tmpl.Execute(w, envelope{"Posts": posts, "Metadata": metadata})
+	if err := tmpl.Execute(w, envelope{"Posts": posts, "Metadata": metadata}); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }

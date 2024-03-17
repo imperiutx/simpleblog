@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -138,4 +139,16 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int32) i
 	}
 
 	return int32(i)
+}
+
+func (app *application) serveFavicon(w http.ResponseWriter, r *http.Request) {
+	filePath := "favicon.ico"
+	fullPath := filepath.Join(".", "static", filePath)
+	http.ServeFile(w, r, fullPath)
+}
+
+func (app *application) serveStaticFiles(w http.ResponseWriter, r *http.Request) {
+	filePath := r.URL.Path[len("/static/"):]
+	fullPath := filepath.Join(".", "static", filePath)
+	http.ServeFile(w, r, fullPath)
 }

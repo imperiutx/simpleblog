@@ -7,6 +7,12 @@ import (
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
+	// static files
+	mux.HandleFunc("GET /favicon.ico", app.serveFavicon)
+	mux.HandleFunc("GET /static/", app.serveStaticFiles)
+	fs := http.FileServer(http.Dir("./templates"))
+	mux.Handle("GET /v1/static/", http.StripPrefix("/static/", fs))
+
 	// health check
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
 

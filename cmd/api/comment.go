@@ -23,7 +23,10 @@ func (app *application) getCreateCommentFormHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	if err := tmpl.Execute(w, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }
 
 func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Request) {

@@ -35,11 +35,6 @@ func newPostResponse(post db.Post) postResponse {
 	}
 }
 
-type postData struct {
-	post     db.Post
-	comments []db.Comment
-}
-
 func (app *application) getCreatePostFormHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./templates/create_post.html"))
 	if err := r.ParseForm(); err != nil {
@@ -47,7 +42,10 @@ func (app *application) getCreatePostFormHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	if err := tmpl.Execute(w, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }
 
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +134,10 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	tmpl.Execute(w, post)
+	if err := tmpl.Execute(w, post); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 }
 
@@ -159,7 +160,10 @@ func (app *application) getPostForEditHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	tmpl.Execute(w, post)
+	if err := tmpl.Execute(w, post); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }
 
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,7 @@
 # simpleblog
 
 In this project I'll try to use:
-- Vannila Golang 1.22 (no framework)
+- Pure Golang 1.22 (no framework)
 - Golang's html/template 
 - SQLC and PGX
 - HTMX 
