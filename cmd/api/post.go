@@ -134,7 +134,17 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := tmpl.Execute(w, post); err != nil {
+	postID := pgtype.Int8{
+		Int64: pid,
+		Valid: true,
+	}
+	comments, err := app.store.ListCommentsByPostID(r.Context(), postID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := tmpl.Execute(w, envelope{"Post": post, "Comments": comments}); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -256,4 +266,29 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+}
+
+func (app *application) listCommentsByPostHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/post.html"))
+
+	pid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	postID := pgtype.Int8{
+		Int64: pid,
+		Valid: true,
+	}
+	comments, err := app.store.ListCommentsByPostID(r.Context(), postID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := tmpl.Execute(w, envelope{"Comments": comments}); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }

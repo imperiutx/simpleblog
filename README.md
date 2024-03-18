@@ -5,10 +5,10 @@ In this project I'll try to use:
 - Golang's html/template 
 - SQLC and PGX
 - HTMX 
-
+- Microsoft's Copilot
+- Google's Gemini
+...
 to create a simple blog
-
-Special thanks to Microsoft's Copilot and Google's Gemini for helping me during building the project. Especially while building the front-end. 
 
 Database design:
 

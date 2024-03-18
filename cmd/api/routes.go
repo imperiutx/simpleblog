@@ -10,8 +10,6 @@ func (app *application) routes() http.Handler {
 	// static files
 	mux.HandleFunc("GET /favicon.ico", app.serveFavicon)
 	mux.HandleFunc("GET /static/", app.serveStaticFiles)
-	fs := http.FileServer(http.Dir("./templates"))
-	mux.Handle("GET /v1/static/", http.StripPrefix("/static/", fs))
 
 	// health check
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
@@ -32,7 +30,7 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
 	mux.HandleFunc("PATCH /v1/posts/{id}", app.updatePostHandler)
 	//TODO: listPostsByTagsHandler
-
+	
 	//comments API
 	mux.HandleFunc("POST /v1/comments", app.createCommentHandler)
 	//TODO: updateCommentHandler

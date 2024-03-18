@@ -49,8 +49,8 @@
 
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title"><strong>{{ .Username.String }}</strong> <br> {{ .CreatedAt.Format
-                            "2006-01-02" }}</h5>
+                        <h5 class="card-title"><strong>{{ .Username.String }}</strong> <br> <em>{{ .CreatedAt.Format
+                                "2006-01-02" }}</em></h5>
                         <p class="mb-0">Tags: {{.Tags}}</p>
                     </div>
                 </div>

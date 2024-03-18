@@ -21,26 +21,35 @@
     <main class="container d-flex flex-column">
         <article class="card shadow-sm rounded mb-5">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="card-title">{{.Title}}</h2>
-                <p class="text-muted mb-0"><strong>{{.Username.String}}</strong><br>{{.CreatedAt.Format "2006-01-02"}}
+                <h2 class="card-title">{{.Post.Title}}</h2>
+                <p class="text-muted mb-0"><strong>{{.Post.Username.String}}</strong><br>{{.Post.CreatedAt.Format
+                    "2006-01-02"}}
                 </p>
             </div>
             <div class="card-body">
-                <p>{{.Content}}</p>
+                <p>{{.Post.Content}}</p>
             </div>
             <div class="card-footer text-muted">
-                <p class="mb-0">Tags: {{.Tags}}</p>
+                <p class="mb-0">Tags: {{.Post.Tags}}</p>
             </div>
         </article>
 
         <hr>
-        <p>{{ printf "%#v" . }}</p>
 
-        <hr>
-
-        <div id="comments-container">
-            <h4>This is the comment part</h4>
+        <div id="comments-container" class="mt-4">
+            <h2 class="mb-4">Comments</h2>
+            {{range .Comments}}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>{{.Username.String}}</strong> - {{.CreatedAt.Format "2006-01-02"}}
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{.Content}}</p>
+                </div>
+            </div>
+            {{end}}
         </div>
+
         <button hx-get="/v1/comments/new" hx-swap="outerHTML" class="btn btn-sm btn-primary ms-2">Create New
             Comment</button>
 
