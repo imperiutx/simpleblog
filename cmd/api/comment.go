@@ -23,7 +23,10 @@ func (app *application) getCreateCommentFormHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	if err := tmpl.Execute(w, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }
 
 func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +73,7 @@ func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	case "application/x-www-form-urlencoded":
-		pid, err := strconv.ParseInt(r.PostFormValue("post_id"), 10, 64)
+		pid, err := strconv.ParseInt(r.PostFormValue("postid"), 10, 64)
 		if err != nil {
 			app.badRequestResponse(w, r, err)
 			return
