@@ -1,6 +1,7 @@
 package main
 
 import (
+	"expvar"
 	"net/http"
 )
 
@@ -30,11 +31,13 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
 	mux.HandleFunc("PATCH /v1/posts/{id}", app.updatePostHandler)
 	//TODO: listPostsByTagsHandler
-	
+
 	//comments API
 	mux.HandleFunc("POST /v1/comments", app.createCommentHandler)
 	//TODO: updateCommentHandler
 	//TODO: deleteCommentHandler
 
-	return app.recoverPanic(app.rateLimit(mux))
+	mux.Handle("GET /debug/vars", expvar.Handler())
+
+	return app.metrics(app.recoverPanic(app.rateLimit(mux)))
 }

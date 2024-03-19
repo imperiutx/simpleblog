@@ -25,7 +25,7 @@
                     <a class="nav-link active" href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="/v1/posts/new">Create New Post</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Categories</a>
@@ -60,7 +60,8 @@
 
         <aside class="col-md-3 col-sm-4 rightcolumn">
             <h3>About Me</h3>
-            <p>Hi! I'm [Your Name]. I'm a [Your Role] with a passion for [Your Interests].</p>
+            <p>Hi! I'm <strong>{{.Author.Username}}</strong>. I'm the <strong>{{.Author.Role}}</strong> of this blog.
+            </p>
             <ul class="list-unstyled">
                 <li>
                     <a href="[Your Twitter URL]" target="_blank">
@@ -79,14 +80,15 @@
                 </li>
             </ul>
             <hr>
-            <h3>Create New Post</h3>
-            <button hx-get="/v1/posts/new" hx-swap="outerHTML" class="btn btn-primary mb-3">Create New Post
+            <h3>Sign In</h3>
+            <button hx-get="/v1/posts/new" hx-swap="outerHTML" class="btn btn-primary mb-3">Sign In
             </button>
         </aside>
     </main>
 
     <footer class="footer">
         <h2>Footer</h2>
+        <a href="#">Back to top</a>
         {{ .Metadata }}
     </footer>
 
