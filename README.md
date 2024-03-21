@@ -13,3 +13,10 @@ Database design:
 
 ![image info](./pictures/simple_blog.png)
 
+Main page's UI:
+
+![image info](./pictures/main_page_ui.png)
+
+Post page's UI:
+
+![image info](./pictures/post_page_ui.png)
