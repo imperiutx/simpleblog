@@ -4,12 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://unpkg.com/htmx.org@1.9.11"
-        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
-        crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <title>My Blog</title>
 </head>
 
@@ -19,19 +14,20 @@
     </header>
 
     <main class="row">
-        <nav class="col-md-3 col-sm-4 leftcolumn">
-            <ul class="nav flex-column">
+
+        <nav>
+            <ul class="nav">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Home</a>
+                    <a href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/v1/posts/new">Create New Post</a>
+                    <a href="/v1/posts/new">Create New Post</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Categories</a>
+                    <a href="#">Categories</a>
                 </li>
             </ul>
-            <h3>Popular Tags</h3>
+            <h4>Popular Tags</h4>
             <ul>
                 <li><a href="#">#webdev</a></li>
                 <li><a href="#">#design</a></li>
@@ -39,7 +35,7 @@
             </ul>
         </nav>
 
-        <section class="col-md-6 col-sm-8 middlecolumn">
+        <section>
             <h2>Latest Posts</h2>
             {{range .Posts}}
             <article class="card shadow-sm rounded mb-3"> <a href="/v1/posts/{{.ID}}"
@@ -49,8 +45,8 @@
 
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title"><strong>{{ .Username.String }}</strong> <br> <em>{{ .CreatedAt.Format
-                                "2006-01-02" }}</em></h5>
+                        <h5 class="card-title"><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format
+                                "2006-01-02" }}</time></h5>
                         <p class="mb-0">Tags: {{.Tags}}</p>
                     </div>
                 </div>
@@ -58,16 +54,11 @@
             {{end}}
         </section>
 
-        <aside class="col-md-3 col-sm-4 rightcolumn">
+        <aside>
             <h3>About Me</h3>
             <p>Hi! I'm <strong>{{.Author.Username}}</strong>. I'm the <strong>{{.Author.Role}}</strong> of this blog.
             </p>
             <ul class="list-unstyled">
-                <li>
-                    <a href="[Your Twitter URL]" target="_blank">
-                        <i class="bi bi-twitter"></i> Twitter
-                    </a>
-                </li>
                 <li>
                     <a href="[Your Github URL]" target="_blank">
                         <i class="bi bi-github"></i> Github

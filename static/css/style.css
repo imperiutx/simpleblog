@@ -1,17 +1,87 @@
-.btn-primary.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.5;
+body {
+    width: 90%;
+    margin: auto;
+    background-color: #F3F3F3;
+    font-family: "Georgia", serif;
+    padding: 20px;
 }
 
-.card article .card-body p {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    /* Prevent wrapping */
-    width: min-content;
-    /* Optional: Adjust width */
+.header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #333;
+    color: #fff;
+    font-size: 2em;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+}
+
+.leftcolumn,
+.middlecolumn,
+.rightcolumn {
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.leftcolumn {
+    width: 25%;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.middlecolumn {
+    width: 50%;
+    margin: 0 10px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.rightcolumn {
+    width: 20%;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.nav {
+    list-style-type: none;
+    padding: 0;
+    background-color: #333;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+
+.nav-item:hover {
+    background-color: #444;
+}
+
+.card {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    font-size: 1.2em;
+    border-radius: 5px;
 }
