@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime"
 	db "simpleblog/db/sqlc"
+	"simpleblog/token"
 	"simpleblog/util"
 	"sync"
 	"time"
@@ -19,10 +20,11 @@ var (
 )
 
 type application struct {
-	config util.Config
-	logger *slog.Logger
-	store  db.Store
-	wg     sync.WaitGroup
+	config     util.Config
+	logger     *slog.Logger
+	store      db.Store
+	wg         sync.WaitGroup
+	tokenMaker token.Maker
 }
 
 func main() {
@@ -70,11 +72,21 @@ func run() error {
 
 	logger.Info("pgx connection pool established")
 
+	//Token maker
+	tokenMaker, err := token.NewPasetoMaker(cfg.TokenSymmetricKey)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("Token phase started")
+
+
 	// App
 	app := &application{
 		config: cfg,
 		logger: logger,
 		store:  db.NewStore(dbpool),
+		tokenMaker: tokenMaker,
 	}
 
 	if err = app.serve(); err != nil {

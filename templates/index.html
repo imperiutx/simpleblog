@@ -13,41 +13,31 @@
         <h2>Welcome to my Blog</h2>
     </header>
 
-    <main class="row">
-
-        <nav>
+    <main>
+        <nav role="navigation">
             <ul class="nav">
                 <li class="nav-item">
                     <a href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/v1/posts/new">Create New Post</a>
+                    <a href="/v1/login">Login</a>
                 </li>
-                <li class="nav-item">
-                    <a href="#">Categories</a>
-                </li>
-            </ul>
-            <h4>Popular Tags</h4>
-            <ul>
-                <li><a href="#">#golang</a></li>
-                <li><a href="#">#css</a></li>
-                <li><a href="#">#HTMX</a></li>
             </ul>
         </nav>
 
         <section>
             <h2>Latest Posts</h2>
             {{range .Posts}}
-            <article class="card shadow-sm rounded mb-3"> <a href="/v1/posts/{{.ID}}"
-                    class="card-title stretched-link text-decoration-none">
-                    <h2>{{ .Title }}</h2>
+            <article class="card">
+                <a href="/v1/posts/{{.ID}}">
+                    <h2 class="card-title">{{ .Title }}</h2>
                 </a>
 
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title"><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format
-                                "2006-01-02" }}</time></h5>
-                        <p class="mb-0">Tags: {{.Tags}}</p>
+                <div class="card-content">
+                    <div>
+                        <h5><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format "2006-01-02"
+                                }}</time></h5>
+                        <p>Tags: {{.Tags}}</p>
                     </div>
                 </div>
             </article>
@@ -58,22 +48,15 @@
             <h3>About Me</h3>
             <p>Hi! I'm <strong>{{.Author.Username}}</strong>. I'm the <strong>{{.Author.Role}}</strong> of this blog.
             </p>
-            <ul class="list-unstyled">
+            <ul>
                 <li>
-                    <a href="[Your Github URL]" target="_blank">
-                        <i class="bi bi-github"></i> Github
-                    </a>
+                    <a href="[Your Github URL]" target="_blank">Github</a>
                 </li>
                 <li>
-                    <a href="mailto:[Your Email Address]">
-                        <i class="bi bi-envelope"></i> Email
-                    </a>
+                    <a href="mailto:[Your Email Address]">Email</a>
                 </li>
             </ul>
             <hr>
-            <h3>Sign In</h3>
-            <button hx-get="/v1/posts/new" hx-swap="outerHTML" class="btn btn-primary mb-3">Sign In
-            </button>
         </aside>
     </main>
 
@@ -83,7 +66,6 @@
         {{ .Metadata }}
     </footer>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.min.css">
 </body>
 
 </html>

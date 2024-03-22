@@ -35,19 +35,6 @@ func newPostResponse(post db.Post) postResponse {
 	}
 }
 
-func (app *application) getCreatePostFormHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/create_post.html"))
-	if err := r.ParseForm(); err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
-	if err := tmpl.Execute(w, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-}
-
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Header.Get("Content-Type") {
 	case "application/json":

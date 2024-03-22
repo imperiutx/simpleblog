@@ -22,6 +22,30 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/admin_dashboard.html"))
+
+	comments, err := app.store.ListAllComments(r.Context())
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	users, err := app.store.ListAllUsers(r.Context())
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := tmpl.Execute(w,
+		envelope{
+			"Users":    users,
+			"Comments": comments}); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}
+
 func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./templates/index.html"))
 
@@ -72,6 +96,19 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 			"Posts":    posts,
 			"Metadata": metadata,
 			"Author":   author}); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}
+
+func (app *application) getUserLoginHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/log_in.html"))
+	if err := r.ParseForm(); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}

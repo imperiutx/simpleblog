@@ -1,49 +1,50 @@
 body {
-    width: 90%;
-    margin: auto;
-    background-color: #F3F3F3;
     font-family: "Georgia", serif;
-    padding: 20px;
+    padding: 15px;
+    /* Reduce padding for better content fit */
+    background-color: #F3F3F3;
+    margin: 0;
+    /* Remove margin for full-width layout */
 }
 
-.header {
+header {
     text-align: center;
-    padding: 20px 0;
+    padding: 15px 0;
     background-color: #333;
     color: #fff;
-    font-size: 2em;
+    font-size: 1.5em;
+    /* Adjust font size for better scaling */
 }
 
-.row {
+main {
     display: flex;
+    /* Maintain flexbox layout */
+    flex-wrap: wrap;
+    /* Wrap content on smaller screens */
     justify-content: space-between;
-    padding: 20px 0;
+    padding: 15px 0;
 }
 
-.leftcolumn,
-.middlecolumn,
-.rightcolumn {
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.leftcolumn {
-    width: 25%;
+nav,
+section,
+aside {
+    width: 100%;
+    /* Make sections full-width on small screens */
+    margin: 10px 0;
+    /* Maintain some spacing */
     background-color: #fff;
     border-radius: 5px;
+    padding: 15px;
 }
 
-.middlecolumn {
-    width: 50%;
-    margin: 0 10px;
-    background-color: #fff;
-    border-radius: 5px;
-}
+@media (max-width: 768px) {
 
-.rightcolumn {
-    width: 20%;
-    background-color: #fff;
-    border-radius: 5px;
+    nav,
+    section,
+    aside {
+        /* Stack elements vertically on smaller screens */
+        flex-direction: column;
+    }
 }
 
 .nav {
@@ -69,19 +70,93 @@ body {
     background-color: #444;
 }
 
-.card {
+article {
     border: 1px solid #ddd;
     margin-bottom: 20px;
-    padding: 20px;
+    padding: 15px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
 }
 
-.footer {
+footer {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
     background-color: #333;
     color: #fff;
     font-size: 1.2em;
     border-radius: 5px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    /* Maintain full-width for mobile buttons */
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #444;
+}
+
+.comment {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.header,
+.main,
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+@media (min-width: 768px) {
+    .main {
+        display: flex;
+        /* Allow sections to be side-by-side */
+    }
+
+    .header,
+    .footer {
+        flex-direction: row;
+        /* Align header and footer elements horizontally */
+    }
+
+    nav,
+    aside {
+        flex: 1;
+        /* Make navigation and aside columns equal width */
+    }
+
+    section {
+        flex: 2;
+        /* Give main content section double the width of side columns */
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    nav,
+    aside {
+        display: none;
+        /* Hide navigation and aside on mobile */
+    }
+
+    section {
+        width: 100%;
+        /* Make content section full-width on mobile */
+    }
 }

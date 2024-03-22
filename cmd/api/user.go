@@ -212,3 +212,52 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 	}
 
 }
+
+type loginUserRequest struct {
+	Username string `json:"username" validate:"required,alphanum,min=3,max=30"`
+	Password string `json:"password" validate:"required,min=8"`
+}
+
+type loginUserResponse struct {
+	User                 userResponse `json:"user"`
+	AccessToken          string       `json:"access_token"`
+	AccessTokenExpiresAt time.Time    `json:"access_token_expires_at"`
+}
+
+func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := app.store.GetUserByUsername(r.Context(), r.PostFormValue("username"))
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := util.CheckPassword(r.PostFormValue("password"), user.Password); err != nil {
+		app.invalidCredentialsResponse(w, r)
+		return
+	}
+
+	at, ap, err := app.tokenMaker.CreateToken(
+		user.Username,
+		user.Role,
+		app.config.AccessTokenDuration,
+	)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	rsp := loginUserResponse{
+		User:                 newUserResponse(user),
+		AccessToken:          at,
+		AccessTokenExpiresAt: ap.ExpiredAt,
+	}
+
+	if err = app.writeJSON(w, http.StatusOK, envelope{"Lur": rsp}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}

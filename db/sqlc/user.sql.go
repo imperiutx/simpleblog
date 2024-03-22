@@ -72,6 +72,26 @@ func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 	return i, err
 }
 
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, username, password, email, role, status, created_at FROM users
+WHERE username = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.Email,
+		&i.Role,
+		&i.Status,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getUserForUpdate = `-- name: GetUserForUpdate :one
 SELECT id, username, password, email, role, status, created_at FROM users
 WHERE id = $1 LIMIT 1
@@ -91,6 +111,41 @@ func (q *Queries) GetUserForUpdate(ctx context.Context, id int64) (User, error) 
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const listAllUsers = `-- name: ListAllUsers :many
+SELECT id, username, password, email, role, status, created_at
+FROM users
+ORDER BY id DESC
+LIMIT 10
+`
+
+func (q *Queries) ListAllUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.Query(ctx, listAllUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Password,
+			&i.Email,
+			&i.Role,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateUser = `-- name: UpdateUser :one

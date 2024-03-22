@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/css/form_style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1>Login</h1>
+
+    <form id="login-form" hx-post="/v1/users/login" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</body>
+
+</html>

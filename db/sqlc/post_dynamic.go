@@ -13,7 +13,7 @@ func (q *QueriesDynamic) ListPostsDynamic(ctx context.Context, title string, tag
 	WHERE
 		(TO_TSVECTOR('simple', title) @@ PLAINTO_TSQUERY('simple', $1) OR $1 = '')
 		AND (tags @> $2 OR $2 = '{}')
-	ORDER BY %s %s, id ASC
+	ORDER BY %s %s, id DESC
 	LIMIT $3 OFFSET $4`, filters.sortColumn(), filters.sortDirection())
 
 	args := []interface{}{title, tags, filters.limit(), filters.offset()}
