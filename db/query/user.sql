@@ -11,6 +11,10 @@ INSERT INTO users (
 SELECT * FROM users
 WHERE id = $1 LIMIT 1;
 
+-- name: GetUserByUsername :one
+SELECT * FROM users
+WHERE username = $1 LIMIT 1;
+
 -- name: GetUserForUpdate :one
 SELECT * FROM users
 WHERE id = $1 LIMIT 1
@@ -27,3 +31,9 @@ RETURNING id;
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1;
+
+-- name: ListAllUsers :many
+SELECT *
+FROM users
+ORDER BY id DESC
+LIMIT 10;

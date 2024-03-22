@@ -112,3 +112,51 @@ button:hover {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
 }
+
+.header,
+.main,
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+@media (min-width: 768px) {
+    .main {
+        display: flex;
+        /* Allow sections to be side-by-side */
+    }
+
+    .header,
+    .footer {
+        flex-direction: row;
+        /* Align header and footer elements horizontally */
+    }
+
+    nav,
+    aside {
+        flex: 1;
+        /* Make navigation and aside columns equal width */
+    }
+
+    section {
+        flex: 2;
+        /* Give main content section double the width of side columns */
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    nav,
+    aside {
+        display: none;
+        /* Hide navigation and aside on mobile */
+    }
+
+    section {
+        width: 100%;
+        /* Make content section full-width on mobile */
+    }
+}

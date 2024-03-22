@@ -23,3 +23,9 @@ SELECT *
 FROM comments
 WHERE post_id = $1
 ORDER BY id;
+
+-- name: ListAllComments :many
+SELECT *
+FROM comments
+ORDER BY id DESC
+LIMIT 10;

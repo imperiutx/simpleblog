@@ -16,15 +16,17 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
 
 	//templates
-	mux.HandleFunc("GET /", app.showMainPageHandler) //TODO: implement pagination
-	mux.HandleFunc("GET /v1/posts/new", app.getCreatePostFormHandler)
+	mux.HandleFunc("GET /", app.showMainPageHandler)            //TODO: implement pagination
+	mux.HandleFunc("GET /admin", app.showAdminDashboardHandler)
 	mux.HandleFunc("GET /v1/comments/new", app.getCreateCommentFormHandler)
 	mux.HandleFunc("GET /v1/posts/{id}/edit", app.getPostForEditHandler)
+	mux.HandleFunc("GET /v1/login", app.getUserLoginHandler)
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
 	mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
 	mux.HandleFunc("PATCH /v1/users/{id}", app.updateUserHandler)
+	mux.HandleFunc("POST /v1/users/login", app.loginUserHandler)
 
 	//posts APIs
 	mux.HandleFunc("POST /v1/posts", app.createPostHandler)
