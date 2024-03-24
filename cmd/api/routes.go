@@ -12,14 +12,21 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /favicon.ico", app.serveFavicon)
 	mux.HandleFunc("GET /static/", app.serveStaticFiles)
 
-	// health check
-	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
+	mux.Handle("GET /debug/vars", expvar.Handler())
 
-	//templates
-	mux.HandleFunc("/", app.showMainPageHandler)            //TODO: implement pagination
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.NotFound(w, r)
+	})
+
+	mux.HandleFunc("/home", app.showMainPageHandler) //TODO: implement pagination
 	mux.HandleFunc("/login", app.loginUserHandler)
 	mux.HandleFunc("/logout", logoutHandler)
-	mux.HandleFunc("GET /admin", app.showAdminDashboardHandler)
+
+	mux.HandleFunc("GET /admin/dashboard", app.showAdminDashboardHandler)
+
+	// v1 := http.NewServeMux()
+	// v1.Handle("/v1/", http.StripPrefix("/v1", mux))
+	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
 	mux.HandleFunc("GET /v1/comments/new", app.getCreateCommentFormHandler)
 	mux.HandleFunc("GET /v1/posts/{id}/edit", app.getPostForEditHandler)
 
@@ -39,7 +46,12 @@ func (app *application) routes() http.Handler {
 	//TODO: updateCommentHandler
 	//TODO: deleteCommentHandler
 
-	mux.Handle("GET /debug/vars", expvar.Handler())
+	stack := createStack(
+		app.logging,
+		app.rateLimit,
+		app.recoverPanic,
+		app.metrics,
+	)
 
-	return app.metrics(app.recoverPanic(app.rateLimit(mux)))
+	return stack(mux)
 }

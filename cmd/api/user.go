@@ -300,7 +300,7 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 			HttpOnly: true,
 		}
 		http.SetCookie(w, cookie)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
 
@@ -322,5 +322,5 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
     http.SetCookie(w, cookie)
 
     // Redirect the user to the main page
-    http.Redirect(w, r, "/", http.StatusSeeOther)
+    http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

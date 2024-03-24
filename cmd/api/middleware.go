@@ -3,6 +3,7 @@ package main
 import (
 	"expvar"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"sync"
@@ -11,6 +12,51 @@ import (
 	"github.com/tomasen/realip"
 	"golang.org/x/time/rate"
 )
+
+type middleware func(http.Handler) http.Handler
+
+func createStack(xs ...middleware) middleware {
+	return func(next http.Handler) http.Handler {
+		for i := len(xs) - 1; i >= 0; i-- {
+			x := xs[i]
+			next = x(next)
+		}
+		return next
+	}
+}
+
+type wrappedWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (w *wrappedWriter) WriteHeader(statusCode int) {
+	w.ResponseWriter.WriteHeader(statusCode)
+	w.statusCode = statusCode
+}
+
+func (app *application) logging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		wrapped := &wrappedWriter{
+			ResponseWriter: w,
+			statusCode:     http.StatusOK,
+		}
+		next.ServeHTTP(wrapped, r)
+
+		logData := fmt.Sprintf(
+			"%d %s %s %v",
+			wrapped.statusCode,
+			r.Method,
+			r.URL.Path,
+			time.Since(start))
+		app.logger.Log(
+			r.Context(),
+			slog.LevelInfo,
+			logData)
+	})
+}
 
 func (app *application) recoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
