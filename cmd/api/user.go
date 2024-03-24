@@ -2,12 +2,15 @@ package main
 
 import (
 	"errors"
+	"html/template"
+	"log/slog"
 	"net/http"
 	db "simpleblog/db/sqlc"
 	"simpleblog/util"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -213,51 +216,111 @@ func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request
 
 }
 
-type loginUserRequest struct {
-	Username string `json:"username" validate:"required,alphanum,min=3,max=30"`
-	Password string `json:"password" validate:"required,min=8"`
-}
-
 type loginUserResponse struct {
-	User                 userResponse `json:"user"`
-	AccessToken          string       `json:"access_token"`
-	AccessTokenExpiresAt time.Time    `json:"access_token_expires_at"`
+	SessionID             uuid.UUID    `json:"sessionId"`
+	AccessToken           string       `json:"access_token"`
+	RefreshToken          string       `json:"refreshToken"`
+	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
+	RefreshTokenExpiredAt time.Time    `json:"refreshTokenExpiredAt"`
+	User                  userResponse `json:"user"`
 }
 
 func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := app.store.GetUserByUsername(r.Context(), r.PostFormValue("username"))
-	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			app.notFoundResponse(w, r)
+	if r.Method == http.MethodPost {
+		r.ParseForm()
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+
+		user, err := app.store.GetUserByUsername(r.Context(), username)
+		if err != nil {
+			if errors.Is(err, db.ErrRecordNotFound) {
+				app.notFoundResponse(w, r)
+				return
+			}
+			app.serverErrorResponse(w, r, err)
 			return
 		}
-		app.serverErrorResponse(w, r, err)
+
+		if err := util.CheckPassword(password, user.Password); err != nil {
+			app.invalidCredentialsResponse(w, r)
+			return
+		}
+
+		accessToken, accessTokenPayload, err := app.tokenMaker.CreateToken(
+			user.Username,
+			user.Role,
+			app.config.AccessTokenDuration,
+		)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		refreshToken, refreshPayload, err := app.tokenMaker.CreateToken(
+			user.Username,
+			user.Role,
+			app.config.RefreshTokenDuration,
+		)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		session, err := app.store.CreateSession(
+			r.Context(),
+			db.CreateSessionParams{
+				ID:           refreshPayload.ID,
+				Username:     user.Username,
+				RefreshToken: refreshToken,
+				UserAgent:    r.UserAgent(),
+				ClientIp:     getIPAdress(r),
+				IsBlocked:    false,
+				ExpiresAt:    refreshPayload.ExpiredAt,
+			})
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		rsp := loginUserResponse{
+			SessionID:             session.ID,
+			User:                  newUserResponse(user),
+			AccessToken:           accessToken,
+			AccessTokenExpiresAt:  accessTokenPayload.ExpiredAt,
+			RefreshToken:          refreshToken,
+			RefreshTokenExpiredAt: refreshPayload.ExpiredAt,
+		}
+
+		app.logger.Log(r.Context(), slog.LevelInfo, ">>>>>>>>>", rsp)
+
+		cookie := &http.Cookie{
+			Name:  "session_token",
+			Value: username,
+			// Secure: true, // Uncomment this when serving over HTTPS
+			HttpOnly: true,
+		}
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	if err := util.CheckPassword(r.PostFormValue("password"), user.Password); err != nil {
-		app.invalidCredentialsResponse(w, r)
-		return
-	}
+	tmpl := template.Must(template.ParseFiles("./templates/log_in.html"))
 
-	at, ap, err := app.tokenMaker.CreateToken(
-		user.Username,
-		user.Role,
-		app.config.AccessTokenDuration,
-	)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
+}
 
-	rsp := loginUserResponse{
-		User:                 newUserResponse(user),
-		AccessToken:          at,
-		AccessTokenExpiresAt: ap.ExpiredAt,
-	}
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+    // Create a new cookie with the same name as the session cookie,
+    // but set its MaxAge to -1 to delete the cookie
+    cookie := &http.Cookie{
+        Name:   "session_token",
+        Value:  "",
+        MaxAge: -1,
+    }
+    http.SetCookie(w, cookie)
 
-	if err = app.writeJSON(w, http.StatusOK, envelope{"Lur": rsp}, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+    // Redirect the user to the main page
+    http.Redirect(w, r, "/", http.StatusSeeOther)
 }

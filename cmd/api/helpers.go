@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -151,4 +152,13 @@ func (app *application) serveStaticFiles(w http.ResponseWriter, r *http.Request)
 	filePath := r.URL.Path[len("/static/"):]
 	fullPath := filepath.Join(".", "static", filePath)
 	http.ServeFile(w, r, fullPath)
+}
+
+func getIPAdress(r *http.Request) string {
+	forwarded := r.Header.Get("X-Forwarded-For")
+	if forwarded != "" {
+		return strings.Split(forwarded, ",")[0]
+	}
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return ip
 }

@@ -16,7 +16,7 @@ dropdb:
 	docker exec -it simple_blog_db dropdb simpleblog
 
 genmi:
-	migrate create -ext sql -dir db/migration -seq init_schema
+	migrate create -ext sql -dir db/migration -seq add_sessions
 
 mgu:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simpleblog?sslmode=disable" -verbose up
