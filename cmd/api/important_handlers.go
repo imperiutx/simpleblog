@@ -47,8 +47,19 @@ func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http
 }
 
 func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/index.html"))
 
+	username := "Guest"
+	cookie, err := r.Cookie("session_token")
+	if err == nil {
+		username = cookie.Value
+	}
+
+	data := struct {
+		Username string
+	}{
+		Username: username,
+	}
+	
 	var input struct {
 		Title string
 		Tags  []string
@@ -91,24 +102,14 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	tmpl := template.Must(template.ParseFiles("./templates/index.html"))
+
 	if err := tmpl.Execute(w,
 		envelope{
 			"Posts":    posts,
 			"Metadata": metadata,
-			"Author":   author}); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-}
-
-func (app *application) getUserLoginHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/log_in.html"))
-	if err := r.ParseForm(); err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
-	if err := tmpl.Execute(w, nil); err != nil {
+			"Author":   author,
+			"Data":     data}); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
