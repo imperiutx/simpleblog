@@ -20,7 +20,7 @@ func (app *application) routes() http.Handler {
 
 	mux.HandleFunc("/home", app.showMainPageHandler) //TODO: implement pagination
 	mux.HandleFunc("/login", app.loginUserHandler)
-	mux.HandleFunc("/logout", logoutHandler)
+	mux.HandleFunc("/logout", app.logoutHandler)
 
 	mux.HandleFunc("GET /admin/dashboard", app.showAdminDashboardHandler)
 

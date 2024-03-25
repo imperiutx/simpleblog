@@ -49,7 +49,7 @@ func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http
 func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	username := "Guest"
-	cookie, err := r.Cookie("session_token")
+	cookie, err := r.Cookie("username")
 	if err == nil {
 		username = cookie.Value
 	}

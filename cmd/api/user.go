@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"html/template"
-	"log/slog"
 	"net/http"
 	db "simpleblog/db/sqlc"
 	"simpleblog/util"
@@ -291,15 +290,30 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 			RefreshTokenExpiredAt: refreshPayload.ExpiredAt,
 		}
 
-		app.logger.Log(r.Context(), slog.LevelInfo, ">>>>>>>>>", rsp)
+		// app.logger.Log(r.Context(), slog.LevelInfo, ">>>>>>>>>", rsp)
 
-		cookie := &http.Cookie{
-			Name:  "session_token",
-			Value: username,
-			// Secure: true, // Uncomment this when serving over HTTPS
+		ucookie := &http.Cookie{
+			Name:     "username",
+			Path:     "/",
+			Value:    username,
+			MaxAge:   3600,
+			Secure:   true,
 			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
 		}
-		http.SetCookie(w, cookie)
+		http.SetCookie(w, ucookie)
+
+		scookie := &http.Cookie{
+			Name:     "session_token",
+			Path:     "/",
+			Value:    rsp.RefreshToken,
+			MaxAge:   3600 * 24,
+			Secure:   true,
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+		}
+		http.SetCookie(w, scookie)
+
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -311,16 +325,33 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
-    // Create a new cookie with the same name as the session cookie,
-    // but set its MaxAge to -1 to delete the cookie
-    cookie := &http.Cookie{
-        Name:   "session_token",
-        Value:  "",
-        MaxAge: -1,
-    }
-    http.SetCookie(w, cookie)
+func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
-    // Redirect the user to the main page
-    http.Redirect(w, r, "/home", http.StatusSeeOther)
+	cookie, err := r.Cookie("username")
+	if err == nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+
+	
+
+	scookie := &http.Cookie{
+		Name:   "session_token",
+		Value:  "",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, scookie)
+
+
+
+	ucookie := &http.Cookie{
+		Name:   "username",
+		Value:  "",
+		MaxAge: -1,
+	}
+
+	
+	http.SetCookie(w, ucookie)
+
+	// Redirect the user to the main page
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
