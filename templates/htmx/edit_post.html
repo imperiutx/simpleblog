@@ -12,7 +12,7 @@
 
 <body>
 
-  <form hx-patch="/v1/posts/{{.ID}}" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
+  <form id="edit-post" hx-patch="/v1/posts/{{.ID}}/edit" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
     <h2>Edit Post</h2>
 
     <div class="form-group">
@@ -32,3 +32,11 @@
 </body>
 
 </html>
+
+<script>
+  document.body.addEventListener('htmx:afterSwap', function (event) {
+    if (event.detail.target.id === 'edit-post') {
+      window.location.href = '/v1/posts/{{.ID}}';
+    }
+  });
+</script>

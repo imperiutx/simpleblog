@@ -27,8 +27,7 @@ func (app *application) routes() http.Handler {
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", mux))
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
-	mux.HandleFunc("GET /v1/comments/new", app.getCreateCommentFormHandler)
-	mux.HandleFunc("GET /v1/posts/{id}/edit", app.getPostForEditHandler)
+	// mux.HandleFunc("GET /v1/comments/new", app.getCreateCommentFormHandler)
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
@@ -38,11 +37,11 @@ func (app *application) routes() http.Handler {
 	//posts APIs
 	mux.HandleFunc("POST /v1/posts", app.createPostHandler)
 	mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
-	mux.HandleFunc("PATCH /v1/posts/{id}", app.updatePostHandler)
+	mux.HandleFunc("/v1/posts/{id}/edit", app.updatePostHandler)
 	//TODO: listPostsByTagsHandler
 
 	//comments API
-	mux.HandleFunc("POST /v1/comments", app.createCommentHandler)
+	mux.HandleFunc("/v1/comments/{id}/new", app.createCommentHandler)
 	//TODO: updateCommentHandler
 	//TODO: deleteCommentHandler
 

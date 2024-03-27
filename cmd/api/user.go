@@ -318,7 +318,7 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./templates/log_in.html"))
+	tmpl := template.Must(template.ParseFiles("./templates/htmx/log_in.html"))
 
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -327,13 +327,6 @@ func (app *application) loginUserHandler(w http.ResponseWriter, r *http.Request)
 
 func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
-	cookie, err := r.Cookie("username")
-	if err == nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
-
-	
-
 	scookie := &http.Cookie{
 		Name:   "session_token",
 		Value:  "",
@@ -341,17 +334,13 @@ func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, scookie)
 
-
-
 	ucookie := &http.Cookie{
 		Name:   "username",
 		Value:  "",
 		MaxAge: -1,
 	}
 
-	
 	http.SetCookie(w, ucookie)
 
-	// Redirect the user to the main page
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

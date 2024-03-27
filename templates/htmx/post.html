@@ -14,7 +14,7 @@
 
 <body>
     <header>
-        <h2>Welcome to my Blog</h2>
+        <h2>The minimalist blog</h2>
     </header>
 
     <main>
@@ -22,7 +22,7 @@
         <nav>
             <ul class="nav">
                 <li class="nav-item">
-                    <a href="#">Home</a>
+                    <a href="/home">Home</a>
                 </li>
                 <li class="nav-item">
                     <a href="/v1/posts/{{.Post.ID}}/edit">Edit the post</a>
@@ -39,7 +39,11 @@
                 </p>
                 <p>{{.Post.Content}}</p>
                 <p>Tags: {{.Post.Tags}}</p>
+
             </article>
+            <div>
+
+            </div>
 
             <hr>
 
@@ -53,7 +57,7 @@
                 {{end}}
             </div>
 
-            <button hx-get="/v1/comments/new" hx-swap="outerHTML">Create New Comment</button>
+            <button hx-get="/v1/comments/{{.Post.ID}}/new" hx-swap="outerHTML">Create New Comment</button>
 
             <hr>
         </section>
