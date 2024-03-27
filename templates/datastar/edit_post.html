@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update the post using Datastar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
+</head>
+<body>
+    <div 
+    id={{.ID}}
+    data-merge-store="{
+          id: {{.ID}},
+          title: {{.Post.Title}},
+          lastName: {{.Post.Content}}
+      }"
+    >
+        <div class="form-control">
+            <label>Title</label>
+            <input type="text" data-model="title" />
+        </div>
+        <div>
+            <label>Content</label>
+            <input type="text" data-model="content" />
+        </div>
+        <div>
+            <button data-on-click="$$patch('/v1/posts/{{.ID}}')">
+                Save
+            </button>
+            <button data-on-click="$$get('/v1/posts/{{.ID}}')">
+                Cancel
+            </button>
+        </div>
+    </div>
+    
+</body>
+</html>
+

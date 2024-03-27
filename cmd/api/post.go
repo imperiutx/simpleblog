@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	db "simpleblog/db/sqlc"
@@ -104,7 +105,6 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/post.html"))
 	pid, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
@@ -131,6 +131,9 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	file := fePath + "post.html"
+	tmpl := template.Must(template.ParseFiles(file))
+
 	if err := tmpl.Execute(w, envelope{"Post": post, "Comments": comments}); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -138,65 +141,17 @@ func (app *application) showPostHandler(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func (app *application) getPostForEditHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/edit_post.html"))
-
-	pid, err := app.readIDParam(r)
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
-	post, err := app.store.GetPostForUpdate(r.Context(), pid)
-	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			app.notFoundResponse(w, r)
-			return
-		}
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-
-	if err := tmpl.Execute(w, post); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-}
-
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
-
 	pid, err := app.readIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	switch r.Header.Get("Content-Type") {
-	case "application/json":
+	switch r.Method {
 
-		var updatePostRequest struct {
-			Title   string `json:"title"`
-			Content string `json:"content"`
-		}
-
-		if err := app.readJSON(w, r, &updatePostRequest); err != nil {
-			app.badRequestResponse(w, r, err)
-			return
-		}
-
-		data := db.UpdatePostParams{
-			ID: pid,
-			Title: pgtype.Text{
-				String: updatePostRequest.Title,
-				Valid:  true,
-			},
-			Content: pgtype.Text{
-				String: updatePostRequest.Content,
-				Valid:  true,
-			},
-		}
-
-		_, err = app.store.UpdatePost(r.Context(), data)
+	case http.MethodGet:
+		post, err := app.store.GetPostForUpdate(r.Context(), pid)
 		if err != nil {
 			if errors.Is(err, db.ErrRecordNotFound) {
 				app.notFoundResponse(w, r)
@@ -206,51 +161,98 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		if err = app.writeJSON(
-			w,
-			http.StatusAccepted,
-			envelope{"update_post": "success"}, nil); err != nil {
+		file := fePath + "edit_post.html"
+		tmpl := template.Must(template.ParseFiles(file))
+
+		if err := tmpl.Execute(w, post); err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
-	case "application/x-www-form-urlencoded":
-		if err := r.ParseForm(); err != nil {
-			app.badRequestResponse(w, r, err)
-			return
-		}
 
-		data := db.UpdatePostParams{
-			ID: pid,
-			Title: pgtype.Text{
-				String: r.FormValue("title"),
-				Valid:  true,
-			},
-			Content: pgtype.Text{
-				String: r.FormValue("content"),
-				Valid:  true,
-			},
-		}
+	case http.MethodPatch:
+		switch r.Header.Get("Content-Type") {
+		case "application/json":
 
-		_, err := app.store.UpdatePost(r.Context(), data)
-		if err != nil {
-			if errors.Is(err, db.ErrRecordNotFound) {
-				app.notFoundResponse(w, r)
+			var updatePostRequest struct {
+				Title   string `json:"title"`
+				Content string `json:"content"`
+			}
+
+			if err := app.readJSON(w, r, &updatePostRequest); err != nil {
+				app.badRequestResponse(w, r, err)
 				return
 			}
-			app.serverErrorResponse(w, r, err)
-			return
-		}
 
-		if err = app.writeJSON(
-			w,
-			http.StatusAccepted, envelope{"Status": "Post updated successfully"}, nil); err != nil {
-			app.serverErrorResponse(w, r, err)
+			data := db.UpdatePostParams{
+				ID: pid,
+				Title: pgtype.Text{
+					String: updatePostRequest.Title,
+					Valid:  true,
+				},
+				Content: pgtype.Text{
+					String: updatePostRequest.Content,
+					Valid:  true,
+				},
+			}
+
+			_, err = app.store.UpdatePost(r.Context(), data)
+			if err != nil {
+				if errors.Is(err, db.ErrRecordNotFound) {
+					app.notFoundResponse(w, r)
+					return
+				}
+				app.serverErrorResponse(w, r, err)
+				return
+			}
+
+			if err = app.writeJSON(
+				w,
+				http.StatusAccepted,
+				envelope{"update_post": "success"}, nil); err != nil {
+				app.serverErrorResponse(w, r, err)
+				return
+			}
+
+		case "application/x-www-form-urlencoded":
+			if err := r.ParseForm(); err != nil {
+				app.badRequestResponse(w, r, err)
+				return
+			}
+
+			data := db.UpdatePostParams{
+				ID: pid,
+				Title: pgtype.Text{
+					String: r.FormValue("title"),
+					Valid:  true,
+				},
+				Content: pgtype.Text{
+					String: r.FormValue("content"),
+					Valid:  true,
+				},
+			}
+
+			_, err := app.store.UpdatePost(r.Context(), data)
+			if err != nil {
+				if errors.Is(err, db.ErrRecordNotFound) {
+					app.notFoundResponse(w, r)
+					return
+				}
+				app.serverErrorResponse(w, r, err)
+				return
+			}
+
+			u := fmt.Sprintf("/v1/posts/%d", pid)
+			http.Redirect(w, r, u, http.StatusSeeOther)
+			return
+
+		default:
+			http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
 			return
 		}
 
 	default:
-		http.Error(w, "Unsupported Content-Type", http.StatusUnsupportedMediaType)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		app.logger.Info("Using method", r.Method, "<<<<<<<")
 		return
 	}
-
 }

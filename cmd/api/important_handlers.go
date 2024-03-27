@@ -23,8 +23,7 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./templates/admin_dashboard.html"))
-
+	
 	comments, err := app.store.ListAllComments(r.Context())
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -37,6 +36,9 @@ func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http
 		return
 	}
 
+	file := fePath + "admin_dashboard.html"
+	tmpl := template.Must(template.ParseFiles(file))
+
 	if err := tmpl.Execute(w,
 		envelope{
 			"Users":    users,
@@ -47,9 +49,8 @@ func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http
 }
 
 func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Request) {
-
 	username := "Guest"
-	cookie, err := r.Cookie("session_token")
+	cookie, err := r.Cookie("username")
 	if err == nil {
 		username = cookie.Value
 	}
@@ -59,7 +60,7 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 	}{
 		Username: username,
 	}
-	
+
 	var input struct {
 		Title string
 		Tags  []string

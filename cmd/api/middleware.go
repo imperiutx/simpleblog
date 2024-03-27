@@ -3,7 +3,6 @@ package main
 import (
 	"expvar"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"sync"
@@ -51,10 +50,8 @@ func (app *application) logging(next http.Handler) http.Handler {
 			r.Method,
 			r.URL.Path,
 			time.Since(start))
-		app.logger.Log(
-			r.Context(),
-			slog.LevelInfo,
-			logData)
+
+		app.logger.Info(logData)
 	})
 }
 
