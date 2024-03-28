@@ -12,6 +12,7 @@ import (
 )
 
 type Querier interface {
+	CountContactByEmail(ctx context.Context, email string) (int64, error)
 	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreateContact(ctx context.Context, arg CreateContactParams) (Contact, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
@@ -33,7 +34,7 @@ type Querier interface {
 	ListAllComments(ctx context.Context, arg ListAllCommentsParams) ([]Comment, error)
 	ListAllUsers(ctx context.Context) ([]User, error)
 	ListCommentsByPostID(ctx context.Context, postID pgtype.Int8) ([]Comment, error)
-	ListContacts(ctx context.Context) ([]Contact, error)
+	ListContacts(ctx context.Context, arg ListContactsParams) ([]Contact, error)
 	ListPosts(ctx context.Context) ([]Post, error)
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
 	UpdateContact(ctx context.Context, arg UpdateContactParams) (Contact, error)

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <title>Edit</title>
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
+</head>
+
+<body hx-boost="true">
+    <form id="edit-contact-form" hx-post="/v1/contacts/edit" hx-trigger="submit" hx-target="#contacts-list"
+        hx-swap="outerHTML">
+        <div class="form-group">
+            <label for="edit_contact_id">Contact ID</label>
+            <input type="text" id="edit_contact_id" name="contact_id" placeholder="Enter the contact ID to edit"
+                required>
+            <input type="text" id="first_name" name="first_name" placeholder="Enter the contact firstname to edit"
+                required>
+            <input type="text" id="last_name" name="last_name" placeholder="Enter the contact lastName to edit"
+                required>
+        </div>
+        <!-- Add form fields for each editable attribute of a contact -->
+        <button type="submit">Edit Contact</button>
+    </form>
+</body>
+
+</html>

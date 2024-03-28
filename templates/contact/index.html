@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <title>Index</title>
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
+</head>
+
+<body hx-boost="true">
+    <header>
+        <h3>Contact Dashboard</h3>
+        <br>
+        <h2>Contact Management System</h2>
+    </header>
+
+    <main class="container">
+        <section class="column left">
+            <h2>All Contacts</h2>
+            {{ template "lad_contact.html" }}
+        </section>
+
+        <section class="column center">
+            <h2>Create New Contact</h2>
+            {{ template "create_contact.html" }}
+        </section>
+
+        <section class="column right">
+            <h2>Edit Contact</h2>
+            {{ template "edit_contact.html" }}
+        </section>
+    </main>
+</body>
+
+</html>

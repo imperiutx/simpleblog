@@ -11,6 +11,18 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countContactByEmail = `-- name: CountContactByEmail :one
+SELECT count(*) FROM contacts
+WHERE email = $1
+`
+
+func (q *Queries) CountContactByEmail(ctx context.Context, email string) (int64, error) {
+	row := q.db.QueryRow(ctx, countContactByEmail, email)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createContact = `-- name: CreateContact :one
 INSERT INTO contacts (
   first_name,
@@ -103,10 +115,17 @@ func (q *Queries) GetContactForUpdate(ctx context.Context, id int64) (Contact, e
 const listContacts = `-- name: ListContacts :many
 SELECT id, first_name, last_name, email, phone, created_at, updated_at FROM contacts
 ORDER BY id
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListContacts(ctx context.Context) ([]Contact, error) {
-	rows, err := q.db.Query(ctx, listContacts)
+type ListContactsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListContacts(ctx context.Context, arg ListContactsParams) ([]Contact, error) {
+	rows, err := q.db.Query(ctx, listContacts, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

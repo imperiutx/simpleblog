@@ -12,7 +12,7 @@ INSERT INTO contacts (
 SELECT * FROM contacts
 WHERE id = $1 LIMIT 1;
 
--- name: GetContactById :one
+-- name: CountContactByEmail :one
 SELECT count(*) FROM contacts
 WHERE email = $1;
 
@@ -23,7 +23,9 @@ FOR NO KEY UPDATE;
 
 -- name: ListContacts :many
 SELECT * FROM contacts
-ORDER BY id;
+ORDER BY id
+LIMIT $1
+OFFSET $2;
 
 -- name: UpdateContact :one
 UPDATE contacts
