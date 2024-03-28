@@ -13,23 +13,30 @@ import (
 
 type Querier interface {
 	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
+	CreateContact(ctx context.Context, arg CreateContactParams) (Contact, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteComment(ctx context.Context, id int64) error
+	DeleteContact(ctx context.Context, id int64) error
 	DeletePost(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetCommentById(ctx context.Context, id int64) (Comment, error)
+	GetContactById(ctx context.Context, id int64) (Contact, error)
+	GetContactForUpdate(ctx context.Context, id int64) (Contact, error)
 	GetPostById(ctx context.Context, id int64) (Post, error)
 	GetPostForUpdate(ctx context.Context, id int64) (Post, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetUserForUpdate(ctx context.Context, id int64) (User, error)
-	ListAllComments(ctx context.Context) ([]Comment, error)
+	ListAllComments(ctx context.Context, arg ListAllCommentsParams) ([]Comment, error)
 	ListAllUsers(ctx context.Context) ([]User, error)
 	ListCommentsByPostID(ctx context.Context, postID pgtype.Int8) ([]Comment, error)
+	ListContacts(ctx context.Context) ([]Contact, error)
 	ListPosts(ctx context.Context) ([]Post, error)
 	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
+	UpdateContact(ctx context.Context, arg UpdateContactParams) (Contact, error)
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (int64, error)
 }

@@ -23,8 +23,18 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (app *application) showAdminDashboardHandler(w http.ResponseWriter, r *http.Request) {
-	
-	comments, err := app.store.ListAllComments(r.Context())
+	var filters db.Filters
+	qs := r.URL.Query()
+
+	filters.Page = app.readInt(qs, "page", 1)
+	filters.PageSize = app.readInt(qs, "page_size", 3)
+
+	pgnt := db.ListAllCommentsParams{
+		Limit:  filters.PageSize,
+		Offset: (filters.Page - 1) * filters.PageSize,
+	}
+
+	comments, err := app.store.ListAllComments(r.Context(), pgnt)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -74,8 +84,8 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 	input.Title = app.readString(qs, "title", "")
 	input.Tags = app.readCSV(qs, "tags", []string{})
 	input.Filters.Page = app.readInt(qs, "page", 1)
-	input.Filters.PageSize = app.readInt(qs, "page_size", 10)
-	input.Filters.Sort = app.readString(qs, "sort", "id")
+	input.Filters.PageSize = app.readInt(qs, "page_size", 3)
+	input.Filters.Sort = app.readString(qs, "sort", "-id")
 
 	input.Filters.SortSafeValues = []string{
 		"id", "title", "-id", "-title",
@@ -103,7 +113,8 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./templates/index.html"))
+	file := fePath + "index.html"
+	tmpl := template.Must(template.ParseFiles(file))
 
 	if err := tmpl.Execute(w,
 		envelope{

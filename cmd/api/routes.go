@@ -23,11 +23,11 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("/logout", app.logoutHandler)
 
 	mux.HandleFunc("GET /admin/dashboard", app.showAdminDashboardHandler)
+	mux.HandleFunc("GET /contacts/dashboard", app.showContactDashboardHandler)
 
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", mux))
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
-	// mux.HandleFunc("GET /v1/comments/new", app.getCreateCommentFormHandler)
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
@@ -42,8 +42,15 @@ func (app *application) routes() http.Handler {
 
 	//comments API
 	mux.HandleFunc("/v1/comments/{id}/new", app.createCommentHandler)
+	mux.HandleFunc("GET /v1/comments", app.ListCommentsHandler)
 	//TODO: updateCommentHandler
 	//TODO: deleteCommentHandler
+	mux.HandleFunc("DELETE /v1/comments/{id}", app.deleteCommentHandler)
+	
+	//contacts API
+	mux.HandleFunc("POST /v1/contacts", app.createContactHandler)
+	mux.HandleFunc("DELETE /v1/contacts/{id}", app.deleteContactHandler)
+	mux.HandleFunc("/v1/contacts/{id}/edit", app.updateContactHandler)
 
 	stack := createStack(
 		app.logging,

@@ -1,15 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/admin.css">
     <title>Document</title>
-    <script src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
 </head>
-<body>
-    
+
+<body hx-boost="true">
+    <header>
+        <h3>Contact Dashboard</h3>
+        <br>
+        <h2>Contact Management System</h2>
+    </header>
+
+    <main class="container">
+        <section class="column left">
+            <h2>All Contacts</h2>
+            <ul id="contacts-list" hx-get="/v1/contacts" hx-trigger="load" hx-target="#contacts-list"
+                hx-swap="outerHTML">
+                {{range .Contacts}}
+                <div class="card-content">
+                    <div>
+                        <p>{{ .ID }} <br> {{ .FirstName.String }}-{{ .LastName.String }} <br> <strong>{{ .Email
+                                }}</strong> <br>
+                            {{ .Phone.String }} <br> </p>
+                    </div>
+                    <button hx-delete="/v1/contacts/{{ .ID }}" hx-push-url="true"
+                        hx-confirm="Are you sure you want to delete this contact?" hx-target="body">Delete
+                        Contact</button>
+                </div>
+                {{end}}
+            </ul>
+        </section>
+
+        <section class="column center">
+            <h2>Create New Contact</h2>
+            <form id="create-contact-form" hx-post="/v1/contacts" hx-trigger="submit" hx-target="#contacts-list"
+                hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="Enter the first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Enter the last name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter the email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter the phone number">
+                </div>
+                <button type="submit">Create Contact</button>
+            </form>
+        </section>
+
+        <section class="column right">
+            <h2>Edit Contact</h2>
+            <form id="edit-contact-form" hx-post="/v1/contacts/edit" hx-trigger="submit" hx-target="#contacts-list"
+                hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="edit_contact_id">Contact ID</label>
+                    <input type="text" id="edit_contact_id" name="contact_id" placeholder="Enter the contact ID to edit"
+                        required>
+                    <input type="text" id="first_name" name="first_name"
+                        placeholder="Enter the contact firstname to edit" required>
+                    <input type="text" id="last_name" name="last_name" placeholder="Enter the contact lastName to edit"
+                        required>
+                </div>
+                <!-- Add form fields for each editable attribute of a contact -->
+                <button type="submit">Edit Contact</button>
+            </form>
+        </section>
+    </main>
 </body>
+
 </html>
-
-
-

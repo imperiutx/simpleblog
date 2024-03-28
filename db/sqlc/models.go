@@ -20,6 +20,16 @@ type Comment struct {
 	EditedAt  time.Time   `json:"edited_at"`
 }
 
+type Contact struct {
+	ID        int64       `json:"id"`
+	FirstName pgtype.Text `json:"first_name"`
+	LastName  pgtype.Text `json:"last_name"`
+	Email     string      `json:"email"`
+	Phone     pgtype.Text `json:"phone"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+}
+
 type Post struct {
 	ID        int64       `json:"id"`
 	Username  pgtype.Text `json:"username"`
