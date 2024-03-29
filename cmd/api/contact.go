@@ -17,11 +17,13 @@ func (app *application) showContactDashboardHandler(w http.ResponseWriter, r *ht
 		app.serverErrorResponse(w, r, err)
 		return
 	}
+}
 
-	file1 := ctPath + "create_contact.html"
-	tmpl1 := template.Must(template.ParseFiles(file1))
+func (app *application) showCreateContactHandler(w http.ResponseWriter, r *http.Request) {
+	file := ctPath + "create_contact.html"
+	tmpl := template.Must(template.ParseFiles(file))
 
-	if err := tmpl1.Execute(w, nil); err != nil {
+	if err := tmpl.Execute(w, nil); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -50,15 +52,7 @@ func (app *application) createContactHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	http.Redirect(w, r, "/v1/contacts/dashboard", http.StatusSeeOther)
-
-	file := ctPath + "create_contact.html"
-	tmpl := template.Must(template.ParseFiles(file))
-
-	if err := tmpl.Execute(w, nil); err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+	http.Redirect(w, r, "/contacts/dashboard", http.StatusSeeOther)
 }
 
 func (app *application) deleteContactHandler(w http.ResponseWriter, r *http.Request) {

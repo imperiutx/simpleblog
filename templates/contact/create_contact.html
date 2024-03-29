@@ -13,7 +13,7 @@
 
 <body hx-boost="true">
     <form id="create-contact-form" hx-post="/v1/contacts" hx-push-url="true" hx-trigger="submit"
-        hx-target="#contacts-list" hx-swap="outerHTML">
+        hx-target="this" hx-swap="outerHTML">
         <div class="form-group">
             <label for="first_name">First Name</label>
             <input type="text" id="first_name" name="first_name" placeholder="Enter the first name" required>

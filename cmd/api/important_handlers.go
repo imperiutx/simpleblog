@@ -84,7 +84,7 @@ func (app *application) showMainPageHandler(w http.ResponseWriter, r *http.Reque
 	input.Title = app.readString(qs, "title", "")
 	input.Tags = app.readCSV(qs, "tags", []string{})
 	input.Filters.Page = app.readInt(qs, "page", 1)
-	input.Filters.PageSize = app.readInt(qs, "page_size", 3)
+	input.Filters.PageSize = app.readInt(qs, "page_size", 4)
 	input.Filters.Sort = app.readString(qs, "sort", "-id")
 
 	input.Filters.SortSafeValues = []string{

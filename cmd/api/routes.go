@@ -48,6 +48,7 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("DELETE /v1/comments/{id}", app.deleteCommentHandler)
 	
 	//contacts API
+	mux.HandleFunc("GET /v1/contacts/new", app.showCreateContactHandler)
 	mux.HandleFunc("POST /v1/contacts", app.createContactHandler)
 	mux.HandleFunc("GET /v1/contacts", app.listContactsHandler)
 	mux.HandleFunc("DELETE /v1/contacts/{id}", app.deleteContactHandler)

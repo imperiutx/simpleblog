@@ -20,18 +20,19 @@
 
     <main class="container">
         <section class="column left">
-            <h2>All Contacts</h2>
-            {{ template "lad_contact.html" }}
-        </section>
-
-        <section class="column center">
             <h2>Create New Contact</h2>
-            {{ template "create_contact.html" }}
+            <button onclick="window.location.href='/v1/contacts/new'">Create New Contact</button>
+            
         </section>
+        
+        <section class="column center">
+            <h2>All Contacts</h2>
+            <button onclick="window.location.href='/v1/contacts'">List Contacts</button>
 
+        </section>
         <section class="column right">
             <h2>Edit Contact</h2>
-            {{ template "edit_contact.html" }}
+            <p>lalala</p>
         </section>
     </main>
 </body>
