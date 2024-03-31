@@ -1,0 +1,43 @@
+{{ define "main" }}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HTMX Essentials</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" href="/static/svg/icon.png" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header id="main-header">
+        <img src="/static/svg/htmx-logo.jpg" alt="HTMX Logo" />
+        <h1>Essentials</h1>
+    </header>
+
+    <main>
+        <p>HTMX is a JavaScript library that you use without writing JavaScript code.</p>
+        <!-- <button hx-get="/app/info" hx-trigger="mouseenter[ctrlKey],click" hx-target="main" hx-swap="outerHTML">Learn
+            More</button> -->
+        <br>
+        <form hx-post="/app/note" hx-target="ul" hx-swap="outerHTML">
+            <p>
+                <label for="note">Your note</label>
+                <input type="text" id="note" name="note">
+            </p>
+            <p>
+                <button>Save Note</button>
+            </p>
+        </form>
+        {{  template "info" . }}
+    </main>
+</body>
+
+</html>
+
+{{ end }}

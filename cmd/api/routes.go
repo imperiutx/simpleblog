@@ -28,6 +28,10 @@ func (app *application) routes() http.Handler {
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", mux))
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
+	
+	mux.HandleFunc("GET /app", app.showAppPageHandler)
+	mux.HandleFunc("GET /app/info", app.showInfoPageHandler)
+	mux.HandleFunc("POST /app/note", app.postNoteHandler)
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
