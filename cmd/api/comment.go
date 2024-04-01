@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"html/template"
 	"net/http"
 	db "simpleblog/db/sqlc"
@@ -118,4 +119,57 @@ func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+}
+
+func (app *application) deleteCommentHandler(w http.ResponseWriter, r *http.Request) {
+	cid, err := app.readIDParam(r)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	_, err = app.store.GetCommentById(r.Context(), cid)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			app.notFoundResponse(w, r)
+			return
+		}
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := app.store.DeleteComment(r.Context(), cid); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+
+}
+
+func (app *application) ListCommentsHandler(w http.ResponseWriter, r *http.Request) {
+	var filters db.Filters
+	qs := r.URL.Query()
+
+	filters.Page = app.readInt(qs, "page", 1)
+	filters.PageSize = app.readInt(qs, "page_size", 3)
+
+	pgnt := db.ListAllCommentsParams{
+		Limit: filters.PageSize,
+		Offset: (filters.Page - 1) * filters.PageSize,
+	}
+	
+	comments, err := app.store.ListAllComments(r.Context(), pgnt)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err = app.writeJSON(
+		w,
+		http.StatusAccepted,
+		envelope{"Comments": comments}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 }

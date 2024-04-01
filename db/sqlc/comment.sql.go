@@ -51,15 +51,40 @@ func (q *Queries) DeleteComment(ctx context.Context, id int64) error {
 	return err
 }
 
+const getCommentById = `-- name: GetCommentById :one
+SELECT id, username, post_id, content, created_at, edited_at FROM comments
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetCommentById(ctx context.Context, id int64) (Comment, error) {
+	row := q.db.QueryRow(ctx, getCommentById, id)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PostID,
+		&i.Content,
+		&i.CreatedAt,
+		&i.EditedAt,
+	)
+	return i, err
+}
+
 const listAllComments = `-- name: ListAllComments :many
 SELECT id, username, post_id, content, created_at, edited_at
 FROM comments
 ORDER BY id DESC
-LIMIT 10
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListAllComments(ctx context.Context) ([]Comment, error) {
-	rows, err := q.db.Query(ctx, listAllComments)
+type ListAllCommentsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListAllComments(ctx context.Context, arg ListAllCommentsParams) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, listAllComments, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

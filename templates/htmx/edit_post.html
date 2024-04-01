@@ -10,7 +10,7 @@
     crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body hx-boost="true">
 
   <form id="edit-post" hx-patch="/v1/posts/{{.ID}}/edit" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
     <h2>Edit Post</h2>

@@ -7,6 +7,10 @@ INSERT INTO comments (
   $1, $2, $3
 ) RETURNING *;
 
+-- name: GetCommentById :one
+SELECT * FROM comments
+WHERE id = $1 LIMIT 1;
+
 -- name: UpdateComment :one
 UPDATE comments
 SET
@@ -28,4 +32,5 @@ ORDER BY id;
 SELECT *
 FROM comments
 ORDER BY id DESC
-LIMIT 10;
+LIMIT $1
+OFFSET $2;

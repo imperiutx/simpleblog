@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
     <title>My Blog</title>
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous"></script>
 </head>
 
-<body class="container">
+<body id="posts" class="container" hx-boost="true">
     <header class="header">
         <h2>The minimalist blog</h2>
     </header>
@@ -27,20 +30,27 @@
 
         <section>
             <h2>Latest Posts</h2>
-            {{range .Posts}}
-            <article class="card">
-                <a href="/v1/posts/{{.ID}}">
-                    <h2 class="card-title">{{ .Title }}</h2>
-                </a>
+            <div>
+                {{range .Posts}}
+                <article class="card">
+                    <a href="/v1/posts/{{.ID}}">
+                        <h2 class="card-title">{{ .Title }}</h2>
+                    </a>
 
-                <div class="card-content">
-                    <div>
-                        <h5><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format "2006-01-02"
-                                }}</time></h5>
-                        <p>Tags: {{.Tags}}</p>
+                    <div class="card-content">
+                        <div>
+                            <h5><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format "2006-01-02"
+                                    }}</time></h5>
+                            <p>Tags: {{.Tags}}</p>
+                        </div>
                     </div>
-                </div>
-            </article>
+                </article>
+                {{end}}
+            </div>
+            {{if lt .Metadata.CurrentPage .Metadata.LastPage }}
+            <button class='btn' hx-get="/home?page={{ .Metadata.NextPage}}" hx-target="#posts" hx-swap="outerHTML">
+                Load More
+            </button>
             {{end}}
         </section>
 
@@ -63,7 +73,7 @@
     <footer class="footer">
         <h2>Footer</h2>
         <a href="#">Back to top</a>
-        {{ .Metadata }}
+
     </footer>
 
 </body>

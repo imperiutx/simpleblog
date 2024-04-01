@@ -12,13 +12,11 @@
     <title>My Blog</title>
 </head>
 
-<body>
+<body hx-boost="true">
     <header>
         <h2>The minimalist blog</h2>
     </header>
-
     <main>
-
         <nav>
             <ul class="nav">
                 <li class="nav-item">
@@ -29,7 +27,6 @@
                 </li>
             </ul>
         </nav>
-
         <section>
             <article>
                 <h2>{{.Post.Title}}</h2>
@@ -37,13 +34,11 @@
                     <strong>{{.Post.Username.String}}</strong><br>
                     {{.Post.CreatedAt.Format "2006-01-02"}}
                 </p>
-                <p>{{.Post.Content}}</p>
+                <pre style="white-space: pre-wrap;">{{.Post.Content}}</pre>
+
                 <p>Tags: {{.Post.Tags}}</p>
 
             </article>
-            <div>
-
-            </div>
 
             <hr>
 
@@ -61,7 +56,7 @@
 
             <hr>
         </section>
-
+        
         <aside>
             <div>
                 <h4>About the Author</h4>
