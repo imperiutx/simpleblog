@@ -1,0 +1,12 @@
+{{ define "goal" }}
+
+<ul id="goals" hx-target="#goals" hx-swap="outerHTML" hx-select="#goals">
+    {{ range $index, $goal := .Goals }}
+    <li>
+        <span> id: {{ $index }} -- {{ $goal }} </span>
+        <button hx-delete="/udm/v2/goals/{{ $index }}" hx-confirm="Are you sure you want to delete this goal?">Remove</button>
+    </li>
+    {{ end }}
+</ul>
+
+{{ end }}

@@ -9,6 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+var (
+	ctPath = "./templates/contact/"
+)
+
 func (app *application) showContactDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	file := ctPath + "index.html"
 	tmpl := template.Must(template.ParseFiles(file))

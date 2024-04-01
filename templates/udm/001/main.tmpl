@@ -14,7 +14,7 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body hx-boost="true">
     <header id="main-header">
         <img src="/static/svg/htmx-logo.jpg" alt="HTMX Logo" />
         <h1>Essentials</h1>
@@ -25,7 +25,8 @@
         <!-- <button hx-get="/app/info" hx-trigger="mouseenter[ctrlKey],click" hx-target="main" hx-swap="outerHTML">Learn
             More</button> -->
         <br>
-        <form hx-post="/app/note" hx-target="ul" hx-swap="outerHTML">
+        <form hx-post="/app/note" hx-target="ul" hx-swap="outerHTML" hx-select="ul">
+            <!-- add hx-select if using method 2 -->
             <p>
                 <label for="note">Your note</label>
                 <input type="text" id="note" name="note">
@@ -34,7 +35,7 @@
                 <button>Save Note</button>
             </p>
         </form>
-        {{  template "info" . }}
+        {{ template "info" . }}
     </main>
 </body>
 

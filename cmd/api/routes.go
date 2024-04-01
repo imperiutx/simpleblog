@@ -28,10 +28,6 @@ func (app *application) routes() http.Handler {
 	// v1 := http.NewServeMux()
 	// v1.Handle("/v1/", http.StripPrefix("/v1", mux))
 	mux.HandleFunc("GET /v1/healthcheck", app.healthcheckHandler)
-	
-	mux.HandleFunc("GET /app", app.showAppPageHandler)
-	mux.HandleFunc("GET /app/info", app.showInfoPageHandler)
-	mux.HandleFunc("POST /app/note", app.postNoteHandler)
 
 	//users APIs
 	mux.HandleFunc("POST /v1/users", app.createUserHandler)
@@ -50,13 +46,21 @@ func (app *application) routes() http.Handler {
 	//TODO: updateCommentHandler
 	//TODO: deleteCommentHandler
 	mux.HandleFunc("DELETE /v1/comments/{id}", app.deleteCommentHandler)
-	
+
 	//contacts API
 	mux.HandleFunc("GET /v1/contacts/new", app.showCreateContactHandler)
 	mux.HandleFunc("POST /v1/contacts", app.createContactHandler)
 	mux.HandleFunc("GET /v1/contacts", app.listContactsHandler)
 	mux.HandleFunc("DELETE /v1/contacts/{id}", app.deleteContactHandler)
 	mux.HandleFunc("/v1/contacts/{id}/edit", app.updateContactHandler)
+
+	// udm apps
+	mux.HandleFunc("GET /udm/v1", app.showAppPageHandler)
+	mux.HandleFunc("GET /udm/v1/info", app.showInfoPageHandler)
+	mux.HandleFunc("POST /udm/v1/note", app.postNoteHandler)
+	mux.HandleFunc("GET /udm/v2/goals", app.showGoalPageHandler)
+	mux.HandleFunc("POST /udm/v2/goals", app.postGoalHandler)
+	mux.HandleFunc("DELETE /udm/v2/goals/{id}", app.deleteGoalHandler)
 
 	stack := createStack(
 		app.logging,

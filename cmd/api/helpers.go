@@ -17,7 +17,6 @@ type envelope map[string]interface{}
 
 var (
 	fePath = "./templates/htmx/" //htmx or datastar
-	ctPath = "./templates/contact/"
 )
 
 func (app *application) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header) error {
@@ -99,7 +98,7 @@ func (app *application) readIDParam(r *http.Request) (int64, error) {
 	}
 
 	mid, err := strconv.ParseInt(id, 10, 64)
-	if err != nil || mid < 1 {
+	if err != nil || mid < 0 {
 		return 0, errors.New("invalid id parameter")
 
 	}
