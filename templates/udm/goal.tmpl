@@ -1,6 +1,6 @@
 {{ define "goal" }}
 
-<ul id="goals" hx-target="#goals" hx-swap="outerHTML" hx-select="#goals">
+<ul id="goals">
     {{ range $index, $goal := .Goals }}
     <li>
         <span> id: {{ $index }} -- {{ $goal }} </span>

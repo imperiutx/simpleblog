@@ -13,13 +13,15 @@
 </head>
 
 <body>
-    <main hx-boost="true">
+    <main hx-boost="true" hx-target="#goals" hx-swap="outerHTML" hx-select="#goals">
         <h1>Manage your course goals</h1>
         <section>
-            <form id="goal-form" hx-post="/udm/v2/goals" hx-target="#goals" hx-swap="outerHTML" hx-select="#goals">
+            <!-- hx-on::after-request="document.querySelector('form').reset() -->
+            <form id="goal-form" hx-post="/udm/v2/goals" hx-on::after-request="this.reset()"
+                hx-disabled-elt="form button">
                 <div>
                     <label htmlFor="goal">Goal</label>
-                    <input type="text" id="goal" name="goal" />
+                    <input type="text" id="goal" name="goal" required />
                 </div>
                 <button type="submit">Add goal</button>
             </form>
