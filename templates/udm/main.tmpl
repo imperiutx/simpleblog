@@ -12,22 +12,36 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body>
-    <main hx-boost="true" hx-target="#goals" hx-swap="outerHTML" hx-select="#goals">
-        <h1>Manage your course goals</h1>
-        <section>
-            <!-- hx-on::after-request="document.querySelector('form').reset() -->
-            <form id="goal-form" hx-post="/udm/v2/goals" hx-on::after-request="this.reset()"
-                hx-disabled-elt="form button">
-                <div>
-                    <label htmlFor="goal">Goal</label>
-                    <input type="text" id="goal" name="goal" required />
-                </div>
-                <button type="submit">Add goal</button>
-            </form>
+<body hx-boost="true">
+    <header>
+        <img src="/static/svg/logo.png" alt="Stylized globe" />
+        <h1>PlacePicker</h1>
+        <p>
+            Create your personal collection of places you would like to visit or
+            you have visited.
+        </p>
+    </header>
+    <main>
+        <section class="locations-category">
+            <h2>My Dream Locations</h2>
+            <ul id="interesting-locations" class="locations">
+                {{range .InterestingLocations}}
+                    {{ printf "%#v" . }}
+                    {{ template "location" . }}
+
+                {{ end }}
+            </ul>
         </section>
-        <section>
-            {{ template "goal" . }}
+
+        <section class="locations-category">
+            <h2>Available Locations</h2>
+            <ul id="available-locations" class="locations">
+                {{range .AvailableLocations}}
+
+                    {{ template "location" . }}
+
+                {{ end }}
+            </ul>
         </section>
     </main>
 </body>

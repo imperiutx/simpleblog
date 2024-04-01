@@ -1,0 +1,11 @@
+{{ define "location" }}
+
+<li class="location-item">
+    <button hx-post="/udm/v3/places" hx-vals='{"locationId": "{{ .ID }}"}' hx-target="#interesting-locations"
+        hx-swap="beforeend">
+        <img src="/static/images/{{.Image.Src}}" alt="{{.Image.Alt}}" />
+        <h3>{{ .Title }}</h3>
+    </button>
+</li>
+
+{{ end }}
