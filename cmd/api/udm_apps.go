@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -24,7 +24,7 @@ var (
 	goals              = []string{}
 	availableLocations = []Location{
 		{
-			ID:    "p1",
+			ID:    "1",
 			Title: "Forest Waterfall",
 			Image: Image{
 				Src: "forest-waterfall.jpg",
@@ -34,7 +34,7 @@ var (
 			Lon: -80.344,
 		},
 		{
-			ID:    "p2",
+			ID:    "2",
 			Title: "Sahara Desert Dunes",
 			Image: Image{
 				Src: "desert-dunes.jpg",
@@ -44,7 +44,7 @@ var (
 			Lon: 0.0,
 		},
 		{
-			ID:    "p3",
+			ID:    "3",
 			Title: "Himalayan Peaks",
 			Image: Image{
 				Src: "majestic-mountains.jpg",
@@ -54,7 +54,7 @@ var (
 			Lon: 86.925,
 		},
 		{
-			ID:    "p4",
+			ID:    "4",
 			Title: "Caribbean Beach",
 			Image: Image{
 				Src: "caribbean-beach.jpg",
@@ -64,7 +64,7 @@ var (
 			Lon: -66.5901,
 		},
 		{
-			ID:    "p5",
+			ID:    "5",
 			Title: "Ancient Grecian Ruins",
 			Image: Image{
 				Src: "ruins.jpg",
@@ -74,7 +74,7 @@ var (
 			Lon: 23.7257,
 		},
 		{
-			ID:    "p6",
+			ID:    "6",
 			Title: "Amazon Rainforest Canopy",
 			Image: Image{
 				Src: "rainforest.jpg",
@@ -84,7 +84,7 @@ var (
 			Lon: -62.2159,
 		},
 		{
-			ID:    "p7",
+			ID:    "7",
 			Title: "Northern Lights",
 			Image: Image{
 				Src: "northern-lights.jpg",
@@ -94,7 +94,7 @@ var (
 			Lon: -19.0208,
 		},
 		{
-			ID:    "p8",
+			ID:    "8",
 			Title: "Japanese Temple",
 			Image: Image{
 				Src: "japanese-temple.jpg",
@@ -104,7 +104,7 @@ var (
 			Lon: 135.785,
 		},
 		{
-			ID:    "p9",
+			ID:    "9",
 			Title: "Great Barrier Reef",
 			Image: Image{
 				Src: "great-barrier-reef.jpg",
@@ -114,7 +114,7 @@ var (
 			Lon: 147.6992,
 		},
 		{
-			ID:    "p10",
+			ID:    "10",
 			Title: "Parisian Streets",
 			Image: Image{
 				Src: "parisian-streets.jpg",
@@ -124,7 +124,7 @@ var (
 			Lon: 2.3522,
 		},
 		{
-			ID:    "p11",
+			ID:    "11",
 			Title: "Grand Canyon",
 			Image: Image{
 				Src: "grand-canyon.jpg",
@@ -134,7 +134,7 @@ var (
 			Lon: -112.1129,
 		},
 		{
-			ID:    "p12",
+			ID:    "12",
 			Title: "Venetian Canals",
 			Image: Image{
 				Src: "venetian-canals.jpg",
@@ -144,7 +144,7 @@ var (
 			Lon: 12.3155,
 		},
 		{
-			ID:    "p13",
+			ID:    "13",
 			Title: "Taj Mahal",
 			Image: Image{
 				Src: "taj-mahal.jpg",
@@ -154,7 +154,7 @@ var (
 			Lon: 78.0421,
 		},
 		{
-			ID:    "p14",
+			ID:    "14",
 			Title: "Kerala Backwaters",
 			Image: Image{
 				Src: "kerala-backwaters.jpg",
@@ -164,7 +164,7 @@ var (
 			Lon: 76.3388,
 		},
 		{
-			ID:    "p15",
+			ID:    "15",
 			Title: "African Savanna",
 			Image: Image{
 				Src: "african-savanna.jpg",
@@ -174,7 +174,7 @@ var (
 			Lon: 34.6857,
 		},
 		{
-			ID:    "p16",
+			ID:    "16",
 			Title: "Victoria Falls",
 			Image: Image{
 				Src: "victoria-falls.jpg",
@@ -184,7 +184,7 @@ var (
 			Lon: 25.8572,
 		},
 		{
-			ID:    "p17",
+			ID:    "17",
 			Title: "Machu Picchu",
 			Image: Image{
 				Src: "machu-picchu.jpg",
@@ -194,7 +194,7 @@ var (
 			Lon: -72.545,
 		},
 		{
-			ID:    "p18",
+			ID:    "18",
 			Title: "Amazon River",
 			Image: Image{
 				Src: "amazon-river.jpg",
@@ -309,22 +309,30 @@ func (app *application) deleteGoalHandler(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, "/udm/v2/goals", http.StatusSeeOther)
 }
 
-func remove(slice []string, index int64) []string {
+func remove[T any](slice []T, index int64) []T {
+	if index < 0 || index >= int64(len(slice)) {
+		return slice
+	}
+
 	slice[index] = slice[len(slice)-1]
 	return slice[:len(slice)-1]
 }
 
+var IsInterested = true
+
 func (app *application) showPlacePageHandler(w http.ResponseWriter, r *http.Request) {
 	file1 := udmPath + "main.tmpl"
 	file2 := udmPath + "location.tmpl"
-	tmpl := template.Must(template.ParseFiles(file1, file2))
+	file3 := udmPath + "deloc.tmpl"
+	tmpl := template.Must(template.ParseFiles(file1, file2, file3))
 
 	if err := tmpl.ExecuteTemplate(
 		w,
 		"main",
 		envelope{
 			"AvailableLocations":   availableLocations,
-			"InterestingLocations": interestingLocations}); err != nil {
+			"InterestingLocations": interestingLocations,
+			"IsInterested":         IsInterested}); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
@@ -346,9 +354,10 @@ func (app *application) postPlaceHandler(w http.ResponseWriter, r *http.Request)
 	lid := strings.Join(as[11:], "")
 
 	var location Location
-	for _, loc := range availableLocations {
+	for i, loc := range availableLocations {
 		if loc.ID == lid {
 			location = loc
+			availableLocations = remove(availableLocations, int64(i))
 			break
 		}
 	}
@@ -358,12 +367,22 @@ func (app *application) postPlaceHandler(w http.ResponseWriter, r *http.Request)
 	file := udmPath + "location.tmpl"
 	tmpl := template.Must(template.ParseFiles(file))
 
-	if err := tmpl.ExecuteTemplate(w, "location", envelope{"InterestingLocations": interestingLocations}); err != nil {
+	if err := tmpl.ExecuteTemplate(
+		w,
+		"location",
+		envelope{"Location": location, "IsInterested": false}); err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	http.Redirect(w, r, "/udm/v3/places", http.StatusSeeOther)
+	// http.Redirect(w, r, "/udm/v3/places", http.StatusSeeOther)
+	// if err = app.writeJSON(
+	// 	w,
+	// 	http.StatusAccepted,
+	// 	envelope{"InterestingLocations": interestingLocations}, nil); err != nil {
+	// 	app.serverErrorResponse(w, r, err)
+	// 	return
+	// }
 }
 
 func (app *application) deletePlaceHandler(w http.ResponseWriter, r *http.Request) {
@@ -373,12 +392,31 @@ func (app *application) deletePlaceHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		app.badRequestResponse(w, r, err)
-		return
+	var (
+		index    int64
+		location Location
+	)
+
+	for i, loc := range interestingLocations {
+		s := strconv.FormatInt(gid, 10)
+		if loc.ID == s {
+			index = int64(i)
+		}
 	}
 
-	fmt.Println(gid)
+	location = interestingLocations[index]
+
+	interestingLocations = remove(interestingLocations, index)
+
+	availableLocations = append(availableLocations, location)
+
+	file := udmPath + "deloc.tmpl"
+	tmpl := template.Must(template.ParseFiles(file))
+
+	if err := tmpl.ExecuteTemplate(w, "deloc", interestingLocations); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	http.Redirect(w, r, "/udm/v3/places", http.StatusSeeOther)
 }

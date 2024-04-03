@@ -1,11 +1,13 @@
-{{ define "location" }}
+{{ define "deloc" }}
 
 <li class="location-item">
-    <button hx-post="/udm/v3/places" hx-vals='{"locationId": "{{ .ID }}"}' hx-target="#interesting-locations"
-        hx-swap="beforeend">
+
+    <button hx-delete="/udm/v3/places/{{ .ID }}" hx-confirm="Are you sure?" hx-target="closet li"
+        hx-swap="outerHTML">
         <img src="/static/images/{{.Image.Src}}" loading="lazy" alt="{{.Image.Alt}}" />
         <h3>{{ .Title }}</h3>
     </button>
+
 </li>
 
 {{ end }}

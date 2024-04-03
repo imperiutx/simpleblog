@@ -22,14 +22,28 @@
         </p>
     </header>
     <main>
+        
         <section class="locations-category">
             <h2>My Dream Locations</h2>
             <ul id="interesting-locations" class="locations">
                 {{range .InterestingLocations}}
-                    {{ printf "%#v" . }}
+
                     {{ template "location" . }}
 
                 {{ end }}
+            </ul>
+        </section>
+
+        <section class="locations-category">
+            <h2>My Test Locations</h2>
+            <ul id="interesting-locations" class="locations">
+            {{ if .IsInterested }}
+                {{range .InterestingLocations}}
+
+	                {{ template "deloc" . }}
+
+	            {{ end }}
+            {{ end }}
             </ul>
         </section>
 
@@ -38,7 +52,7 @@
             <ul id="available-locations" class="locations">
                 {{range .AvailableLocations}}
 
-                    {{ template "location" . }}
+                {{ template "location" . }}
 
                 {{ end }}
             </ul>
