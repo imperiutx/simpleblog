@@ -211,3 +211,37 @@ func (app *application) metrics(next http.Handler) http.Handler {
 		totalProcessingTimeMicroseconds.Add(duration)
 	})
 }
+
+func (app *application) enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Vary", "Origin")
+		w.Header().Add("Vary", "Access-Control-Request-Method")
+
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			for _, trustedOrigin := range app.config.CorsTrustedOrigins {
+				if origin == trustedOrigin {
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+
+					// Treat it as a preflight request.
+					if r.Method == http.MethodOptions &&
+						r.Header.Get("Access-Control-Request-Method") != "" {
+						// Set the necessary preflight response headers.
+						w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, PUT, PATCH, DELETE")
+						w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+						// w.Header().Set("Content-Type", "text/event-stream")
+						// w.Header().Set("Cache-Control", "no-cache")
+						// w.Header().Set("Connection", "keep-alive")
+						// Return from the middleware with no further action.
+						w.WriteHeader(http.StatusOK)
+						return
+					}
+
+					break
+				}
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

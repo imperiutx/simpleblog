@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
+
+</head>
+
+<body>
+    <header>
+        <h3>Admin Dashboard</h3>
+        <br>
+        <h2>The minimalist blog</h2>
+    </header>
+
+    <main class="container">
+        <section class="column left">
+            <h2>Latest Comments</h2>
+            <ul id="comments-list">
+                {{range .Comments}}
+                <div class="card-content">
+                    <div>
+                        <p><strong>{{ .Username.String }}</strong> <br> {{ .CreatedAt.Format
+                            "2006-01-02" }} <br> {{.Content}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </ul>
+            <!-- <a href="/v1/comments" hx-get="/v1/comments" hx-target="#comments-list" hx-swap="innerHTML">
+                Load More Comments
+            </a> -->
+            <a data-on-load="$$get('/v1/comments?page=2')">Load More Comments</a>
+        </section>
+
+        <section class="column center">
+            <h2>Create New Post</h2>
+            <form id="create-post-form" hx-post="/v1/posts" hx-trigger="submit" hx-target="this" hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter the title" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea id="content" name="content" required></textarea>
+                </div>
+                <button type="submit">Create Post</button>
+            </form>
+        </section>
+
+        <section class="column right">
+            <h2>View All Users</h2>
+            <ul id="users-list">
+                {{range .Users}}
+                <div class="card-content">
+                    <div>
+                        <p><strong>{{ .Username }}</strong> <br> <time>{{ .CreatedAt.Format
+                                "2006-01-02" }}</time></p>
+                    </div>
+                </div>
+                {{end}}
+            </ul>
+            <a href="/v1/users" hx-get="/v1/users" hx-target="#users-list" hx-swap="innerHTML">
+                Load More Users
+            </a>
+        </section>
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>My Blog</title>
+    <script src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
+
+</head>
+
+<body id="posts" class="container" hx-boost="true">
+    <header class="header">
+        <h2>The minimalist blog</h2>
+    </header>
+
+    <main>
+        <nav role="navigation">
+            <h4>Welcome, {{.Data.Username}}!</h4>
+            {{if eq .Data.Username "Guest"}}
+            <p>You are not logged in.</p>
+            <button onclick="window.location.href='/login'">Login</button>
+            {{else}}
+            <p>You have successfully logged in.</p>
+            <button onclick="window.location.href='/logout'">Logout</button>
+            {{end}}
+        </nav>
+
+        <section>
+            <h2>Latest Posts</h2>
+            <div>
+                {{range .Posts}}
+                <article class="card">
+                    <a href="/v1/posts/{{.ID}}">
+                        <h2 class="card-title">{{ .Title }}</h2>
+                    </a>
+
+                    <div class="card-content">
+                        <div>
+                            <h5><strong>{{ .Username.String }}</strong> <br> <time>{{ .CreatedAt.Format "2006-01-02"
+                                    }}</time></h5>
+                            <p>Tags: {{.Tags}}</p>
+                        </div>
+                    </div>
+                </article>
+                {{end}}
+            </div>
+            {{if lt .Metadata.CurrentPage .Metadata.LastPage }}
+                <button data-on-click="$$get('/home?page={{ .Metadata.NextPage}}')" hx-trigger="revealed"
+                    hx-swap="afterend">
+                    Load More
+                </button>
+            {{end}}
+        </section>
+
+        <aside>
+            <h3>About Me</h3>
+            <p>Hi! I'm <strong>{{.Author.Username}}</strong>. I'm the <strong>{{.Author.Role}}</strong> of this blog.
+            </p>
+            <ul>
+                <li>
+                    <a href="[Your Github URL]" target="_blank">Github</a>
+                </li>
+                <li>
+                    <a href="mailto:[Your Email Address]">Email</a>
+                </li>
+            </ul>
+            <hr>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <h2>Footer</h2>
+        <a href="#">Back to top</a>
+
+    </footer>
+
+</body>
+
+</html>

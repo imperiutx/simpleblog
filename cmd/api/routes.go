@@ -34,7 +34,11 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/users/{id}", app.showUserHandler)
 	mux.HandleFunc("PATCH /v1/users/{id}", app.updateUserHandler)
 
+	//datastar
+	mux.HandleFunc("/datastar", app.showDataStarPostHandler) //TODO: implement pagination
+
 	//posts APIs
+	mux.HandleFunc("GET /v1/posts", app.listDataStarPostHandler)
 	mux.HandleFunc("POST /v1/posts", app.createPostHandler)
 	mux.HandleFunc("GET /v1/posts/{id}", app.showPostHandler)
 	mux.HandleFunc("/v1/posts/{id}/edit", app.updatePostHandler)
@@ -68,6 +72,7 @@ func (app *application) routes() http.Handler {
 	stack := createStack(
 		app.logging,
 		app.rateLimit,
+		app.enableCORS,
 		app.recoverPanic,
 		app.metrics,
 	)

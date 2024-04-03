@@ -256,3 +256,32 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 }
+
+func (app *application) listDataStarPostHandler(w http.ResponseWriter, r *http.Request) {
+	posts, err := app.store.ListPosts(r.Context())
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
+		return
+	}
+
+	for _, post := range posts {
+		fmt.Fprintf(w, "data: %v\n\n", post)
+		flusher.Flush()
+	}
+}
+
+func (app *application) showDataStarPostHandler(w http.ResponseWriter, r *http.Request) {
+	file := fePath + "home.html"
+	tmpl := template.Must(template.ParseFiles(file))
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+}
