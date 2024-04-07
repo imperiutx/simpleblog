@@ -67,6 +67,7 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("DELETE /udm/v2/goals/{id}", app.deleteGoalHandler)
 	mux.HandleFunc("GET /udm/v3/places", app.showPlacePageHandler)
 	mux.HandleFunc("POST /udm/v3/places", app.postPlaceHandler)
+	mux.HandleFunc("/udm/changeplace", app.changePlaceHandler)
 	mux.HandleFunc("DELETE /udm/v3/places/{id}", app.deletePlaceHandler)
 
 	stack := createStack(

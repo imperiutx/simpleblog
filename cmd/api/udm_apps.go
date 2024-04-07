@@ -4,8 +4,10 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 var (
@@ -205,6 +207,7 @@ var (
 		},
 	}
 	interestingLocations = []Location{}
+	mu                   sync.Mutex
 )
 
 type Image struct {
@@ -318,6 +321,28 @@ func remove[T any](slice []T, index int64) []T {
 	return slice[:len(slice)-1]
 }
 
+func remove2(slice []Location, item Location) []Location {
+	for i, v := range slice {
+		if v == item {
+			return append(slice[:i], slice[i+1:]...)
+		}
+	}
+	return slice
+}
+
+func isEmpty(s interface{}) bool {
+	v := reflect.ValueOf(s)
+	if kind := v.Kind(); kind == reflect.Struct {
+		for i := 0; i < v.NumField(); i++ {
+			if !isEmpty(v.Field(i).Interface()) {
+				return false
+			}
+		}
+		return true
+	}
+	return false // Handle non-struct types as needed
+}
+
 var IsInterested = true
 
 func (app *application) showPlacePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -419,4 +444,58 @@ func (app *application) deletePlaceHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	http.Redirect(w, r, "/udm/v3/places", http.StatusSeeOther)
+}
+
+func (app *application) changePlaceHandler(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	item := r.URL.Query().Get("item")
+	from := r.URL.Query().Get("from")
+
+	var location Location
+	for _, loc := range availableLocations {
+		if loc.ID == item {
+			location = loc
+			break
+		}
+	}
+
+	if from == "al" && item != "" {
+		for _, loc := range availableLocations {
+			if loc.ID == item {
+				location = loc
+				break
+			}
+		}
+
+		if !isEmpty(location) {
+			availableLocations = remove2(availableLocations, location)
+			if len(interestingLocations) <= 18 {
+				interestingLocations = append(interestingLocations, location)
+			}
+		}
+	} else if from == "il" && item != "" {
+		for _, loc := range interestingLocations {
+			if loc.ID == item {
+				location = loc
+				break
+			}
+		}
+
+		if !isEmpty(location) {
+			interestingLocations = remove2(interestingLocations, location)
+			if len(availableLocations) <= 18 {
+				availableLocations = append(availableLocations, location)
+			}
+		}
+	}
+
+	file := udmPath + "index.html"
+	tmpl := template.Must(template.ParseFiles(file))
+
+	tmpl.Execute(w, map[string]interface{}{
+		"AvailableLocations":   availableLocations,
+		"InterestingLocations": interestingLocations,
+	})
 }
